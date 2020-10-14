@@ -39,7 +39,8 @@ PrepareEuroparl() {
       wget -q "${urlpref}/${f}" -O "${raw_dir}/${f}"
       echo " - unzip ${f}"
       unzip -q "${raw_dir}/${f}" -d "${raw_dir}"
-      /bin/rm "${raw_dir}/{README,LICENSE}"
+      /bin/rm "${raw_dir}/README"
+      /bin/rm "${raw_dir}/LICENSE"
     fi
   done
 
