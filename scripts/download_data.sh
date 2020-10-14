@@ -30,10 +30,10 @@ MKDIR () {
 ###################################################################
 
 DownloadEuroparl() {
-  echo "Preparing Europarl"
-  europarl_root="${data_root}/europarl"
-  MKDIR ${europarl_root}
-  cd ${europarl_root}
+  echo "Downloading Europarl"
+  raw_dir="${data_root}/europarl/raw"
+  MKDIR ${raw_dir}
+  cd ${raw_dir}
 
   lang_pairs=( "en-es" "de-en" "de-es" "de-fr" "en-fr" "es-fr" )
 
