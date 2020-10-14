@@ -16,6 +16,7 @@ BPE_CODES = osp.join(LASER, 'models', '93langs.fcodes')
 def preprocess_europarl(lang_pairs, verbose=False):
     raw_dir = osp.join(LASER, 'data', 'europarl', 'raw')
     out_dir = osp.join(LASER, 'data', 'europarl', 'processed')
+    os.makedirs(out_dir, exist_ok=True)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         for lang_pair in lang_pairs:
