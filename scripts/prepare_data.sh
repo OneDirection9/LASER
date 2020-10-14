@@ -56,7 +56,7 @@ PrepareEuroparl() {
         perl "${MOSES_TOKENIZER}" -threds 20 -l "${l}" -q -no-escape | \
         perl "${MOSES_LC}" > "${pro_dir}/train.${lang}.${l}"
 
-      ${FASTBPE} applybpe "${bpe_dir}/train.${lang}.${l}" "${pro_dir}/train.${lang}.${l}" BPE_CODES
+      ${FASTBPE} applybpe "${bpe_dir}/train.${lang}.${l}" "${pro_dir}/train.${lang}.${l}" "${BPE_CODES}"
     done
   done
 }
