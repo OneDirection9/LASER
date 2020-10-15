@@ -18,7 +18,7 @@ DownloadEuroparl() {
   raw_dir="${data_root}/europarl/raw"
   mkdir -p "${raw_dir}"
 
-  lang_pairs=( "en-es" "de-en" "de-es" "de-fr" "en-fr" "es-fr" )
+  lang_pairs=( "en-es" "de-en" "de-es" "de-fr" "en-fr" "es-fr" "en-it")
 
   urlpref="http://opus.nlpl.eu/download.php?f=Europarl/v8/moses"
   for lang_pair in "${lang_pairs[@]}" ; do

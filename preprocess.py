@@ -56,7 +56,7 @@ def process_europarl(lang_pairs, alias, verbose=False):
 def main():
     args = parse_args()
 
-    lang_pairs = ("en-es", "de-en", "de-es", "de-fr", "en-fr", "es-fr")
+    lang_pairs = ("en-es", "de-en", "de-es", "de-fr", "en-fr", "es-fr", "en-it")
     process_europarl(lang_pairs, args.alias, args.verbose)
 
 
