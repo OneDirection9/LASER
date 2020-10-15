@@ -53,11 +53,32 @@ def process_europarl(lang_pairs, alias, verbose=False):
             process(inp_file, out_file, l, bpe_codes, verbose)
 
 
+def process_unpc(lang_pairs, alias, verbose=False):
+    print('Process UNPC (United Nations Parallel Corpus)')
+    bpe_codes = get_bpe_codes(alias)
+
+    raw_dir = osp.join(LASER, 'data', 'unpc', 'raw')
+    out_dir = osp.join(LASER, 'data', 'unpc', f'bpe{alias}')
+    os.makedirs(out_dir, exist_ok=True)
+
+    for lang_pair in lang_pairs:
+        # example: en-zh
+        src, tgt = lang_pair.split('-')
+        for l in (src, tgt):
+            inp_file = osp.join(raw_dir, f'UNPC.{lang_pair}.{l}')
+            out_file = osp.join(out_dir, f'train.{lang_pair}.{l}')
+            print(f' - processing {inp_file}')
+            process(inp_file, out_file, l, bpe_codes, verbose)
+
+
 def main():
     args = parse_args()
 
     lang_pairs = ("en-es", "de-en", "de-es", "de-fr", "en-fr", "es-fr", "en-it")
     process_europarl(lang_pairs, args.alias, args.verbose)
+
+    lang_pairs = ("en-zh",)
+    process_unpc(lang_pairs, args.alias, args.verbose)
 
 
 if __name__ == '__main__':
