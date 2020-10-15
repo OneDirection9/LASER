@@ -62,11 +62,13 @@ class LaserModel(FairseqEncoderDecoderModel):
 
         if args.encoder_model_path is not None:
             state_dict = torch.load(args.encoder_model_path)
-            encoder = LaserEncoder(**state_dict['params'])
+            params = state_dict['params']
+            assert len(task.source_dictionary) == params['num_embedding']
+            encoder = LaserEncoder(**params)
             encoder.load_state_dict(state_dict['model'])
         else:
             encoder = LaserEncoder(
-                num_embeddings=len(task.source_dictionary),
+                dictionary=task.source_dictionary,
                 embed_dim=args.encoder_embed_dim,
                 hidden_size=args.encoder_hidden_size,
                 num_layers=args.encoder_layers,
@@ -99,12 +101,14 @@ class LaserModel(FairseqEncoderDecoderModel):
         return decoder_out
 
 
-class LaserEncoder(nn.Module):
+class LaserEncoder(FairseqEncoder):
     def __init__(
-            self, num_embeddings, padding_idx, embed_dim=320, hidden_size=512, num_layers=1, bidirectional=False,
-            left_pad=True, padding_value=0.
+        self, dictionary, padding_idx, embed_dim=320, hidden_size=512, num_layers=1,
+        bidirectional=False, left_pad=True, padding_value=0.
     ):
-        super().__init__()
+        super().__init__(dictionary)
+
+        num_embeddings = len(dictionary)
 
         self.num_layers = num_layers
         self.bidirectional = bidirectional
@@ -184,6 +188,7 @@ class LaserEncoder(nn.Module):
             'encoder_out': (x, final_hiddens, final_cells),
             'encoder_padding_mask': encoder_padding_mask if encoder_padding_mask.any() else None
         }
+
 
 class LaserDecoder(FairseqIncrementalDecoder):
 
