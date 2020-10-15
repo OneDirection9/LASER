@@ -33,6 +33,27 @@ DownloadEuroparl() {
   done
 }
 
+DownloadUNPC() {
+  echo "Downloading UNPC (United Nations Parallel Corpus)"
+  raw_dir="${data_root}/unpc/raw"
+  mkdir -p "${raw_dir}"
+
+  lang_pairs=( "en-zh" )
+
+  urlpref="http://opus.nlpl.eu/download.php?f=UNPC/v1.0/moses"
+  for lang_pair in "${lang_pairs[@]}" ; do
+    f="${lang_pair}.txt.zip"
+    if [ ! -f "${raw_dir}/${f}" ] ; then
+      echo " - Downloading ${f}"
+      wget -q "${urlpref}/${f}" -O "${raw_dir}/${f}"
+      echo " - unzip ${f}"
+      unzip -q "${raw_dir}/${f}" -d "${raw_dir}"
+      /bin/rm "${raw_dir}"/{README,LICENSE}
+    fi
+  done
+}
+
 DownloadEuroparl
+DownloadUNPC
 
 echo "Done!!!"
