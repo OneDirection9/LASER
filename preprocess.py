@@ -47,9 +47,9 @@ def process_europarl(lang_pairs, alias, verbose=False):
         # example: en-es
         src, tgt = lang_pair.split('-')
         for l in (src, tgt):
-            print(f' - processing {inp_file}')
             inp_file = osp.join(raw_dir, f'Europarl.{lang_pair}.{l}')
             out_file = osp.join(out_dir, f'train.{lang_pair}.{l}')
+            print(f' - processing {inp_file}')
             process(inp_file, out_file, l, bpe_codes, verbose)
 
 
