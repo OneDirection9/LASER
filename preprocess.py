@@ -36,6 +36,7 @@ def process(inp_file, out_file, lang, bpe_codes, verbose=False):
 
 
 def process_europarl(lang_pairs, alias, verbose=False):
+    print('Process Europarl')
     bpe_codes = get_bpe_codes(alias)
 
     raw_dir = osp.join(LASER, 'data', 'europarl', 'raw')
@@ -46,6 +47,7 @@ def process_europarl(lang_pairs, alias, verbose=False):
         # example: en-es
         src, tgt = lang_pair.split('-')
         for l in (src, tgt):
+            print(f' - processing {inp_file}')
             inp_file = osp.join(raw_dir, f'Europarl.{lang_pair}.{l}')
             out_file = osp.join(out_dir, f'train.{lang_pair}.{l}')
             process(inp_file, out_file, l, bpe_codes, verbose)
