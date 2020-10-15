@@ -22,14 +22,16 @@ ALIAS_TO_VOCAB_NAME = {
     '93': '93langs.fvocab',
 }
 
+MODEL_DIR = osp.join(LASER, 'models')
+
 
 def get_checkpoint(alias: str) -> str:
-    return osp.join(LASER, ALIAS_TO_CHECKPOINT_NAME[alias])
+    return osp.join(MODEL_DIR, ALIAS_TO_CHECKPOINT_NAME[alias])
 
 
 def get_bpe_codes(alias: str) -> str:
-    return osp.join(LASER, ALIAS_TO_BPE_CODES_NAME[alias])
+    return osp.join(MODEL_DIR, ALIAS_TO_BPE_CODES_NAME[alias])
 
 
 def get_vocab(alias: str) -> str:
-    return osp.join(LASER, ALIAS_TO_VOCAB_NAME[alias])
+    return osp.join(MODEL_DIR, ALIAS_TO_VOCAB_NAME[alias])
