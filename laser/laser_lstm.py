@@ -64,7 +64,8 @@ class LaserModel(FairseqEncoderDecoderModel):
             print(f'* Loading parameters from {args.encoder_model_path}')
             state_dict = torch.load(args.encoder_model_path)
             params = state_dict['params']
-            assert len(task.source_dictionary) == params['num_embeddings']
+            assert len(task.source_dictionary) == params.pop('num_embeddings')
+            params['dictionary'] = task.source_dictionary
             encoder = LaserEncoder(**params)
             encoder.load_state_dict(state_dict['model'])
         else:
