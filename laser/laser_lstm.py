@@ -38,6 +38,9 @@ class LaserModel(FairseqEncoderDecoderModel):
         LSTMModel.add_args(parser)
         parser.add_argument('--lang-embedding-size', type=int, default=32,
                             help='language embedding dimension')
+        parser.add_argument('--encoder-model-path', type=str, default=None,
+                            help='path to pretrained model path')
+        parser.add_argument('--fix-encoder', action='store_true')
 
     @classmethod
     def build_model(cls, args, task):
@@ -57,15 +60,23 @@ class LaserModel(FairseqEncoderDecoderModel):
             task.langs[i]: i for i in range(len(task.langs))
         }
 
-        encoder = LaserEncoder(
-            dictionary=task.source_dictionary,
-            embed_dim=args.encoder_embed_dim,
-            hidden_size=args.encoder_hidden_size,
-            num_layers=args.encoder_layers,
-            bidirectional=args.encoder_bidirectional,
-            dropout_in=args.encoder_dropout_in,
-            dropout_out=args.encoder_dropout_out,
-        )
+        if args.encoder_model_path is not None:
+            state_dict = torch.load(args.encoder_model_path)
+            encoder = LaserEncoder(**state_dict['params'])
+            encoder.load_state_dict(state_dict['model'])
+        else:
+            encoder = LaserEncoder(
+                num_embeddings=len(task.source_dictionary),
+                embed_dim=args.encoder_embed_dim,
+                hidden_size=args.encoder_hidden_size,
+                num_layers=args.encoder_layers,
+                bidirectional=args.encoder_bidirectional,
+            )
+
+        if args.fix_encoder:
+            for p in encoder.parameters():
+                p.requires_grad = False
+
         decoder = LaserDecoder(
             dictionary=task.target_dictionary,
             lang_dictionary=lang_dictionary,
@@ -88,29 +99,24 @@ class LaserModel(FairseqEncoderDecoderModel):
         return decoder_out
 
 
-class LaserEncoder(FairseqEncoder):
-
+class LaserEncoder(nn.Module):
     def __init__(
-        self, dictionary, embed_dim=320, hidden_size=512, num_layers=1, bidirectional=False,
-        left_pad=True, padding_value=0., dropout_in=0.1, dropout_out=0.1
+            self, num_embeddings, padding_idx, embed_dim=320, hidden_size=512, num_layers=1, bidirectional=False,
+            left_pad=True, padding_value=0.
     ):
-        super().__init__(dictionary)
+        super().__init__()
 
         self.num_layers = num_layers
-        self.dropout_in = dropout_in
-        self.dropout_out = dropout_out
         self.bidirectional = bidirectional
         self.hidden_size = hidden_size
 
-        num_embeddings = len(dictionary)
-        self.padding_idx = dictionary.pad()
-        self.embed_tokens = Embedding(num_embeddings, embed_dim, self.padding_idx)
+        self.padding_idx = padding_idx
+        self.embed_tokens = nn.Embedding(num_embeddings, embed_dim, padding_idx=self.padding_idx)
 
         self.lstm = nn.LSTM(
             input_size=embed_dim,
             hidden_size=hidden_size,
             num_layers=num_layers,
-            dropout=self.dropout_out if num_layers > 1 else 0.,
             bidirectional=bidirectional,
         )
         self.left_pad = left_pad
@@ -133,7 +139,6 @@ class LaserEncoder(FairseqEncoder):
 
         # embed tokens
         x = self.embed_tokens(src_tokens)
-        x = F.dropout(x, p=self.dropout_in, training=self.training)
 
         # B x T x C -> T x B x C
         x = x.transpose(0, 1)
@@ -152,7 +157,6 @@ class LaserEncoder(FairseqEncoder):
 
         # unpack outputs and apply dropout
         x, _ = nn.utils.rnn.pad_packed_sequence(packed_outs, padding_value=self.padding_value)
-        x = F.dropout(x, p=self.dropout_out, training=self.training)
         assert list(x.size()) == [seqlen, bsz, self.output_units]
 
         if self.bidirectional:
@@ -180,7 +184,6 @@ class LaserEncoder(FairseqEncoder):
             'encoder_out': (x, final_hiddens, final_cells),
             'encoder_padding_mask': encoder_padding_mask if encoder_padding_mask.any() else None
         }
-
 
 class LaserDecoder(FairseqIncrementalDecoder):
 
