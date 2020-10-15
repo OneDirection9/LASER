@@ -16,6 +16,7 @@ data_root="${LASER}/data"
 DownloadEuroparl() {
   echo "Downloading Europarl"
   raw_dir="${data_root}/europarl/raw"
+  mkdir -p "${raw_dir}"
 
   lang_pairs=( "en-es" "de-en" "de-es" "de-fr" "en-fr" "es-fr" )
 
