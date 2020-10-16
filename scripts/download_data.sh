@@ -49,6 +49,12 @@ DownloadUNPC() {
       echo " - unzip ${f}"
       unzip -q "${raw_dir}/${f}" -d "${raw_dir}"
       /bin/rm "${raw_dir}"/{README,LICENSE}
+
+      src=$(echo "${lang_pair}" | cut -d'-' -f1)
+      tgt=$(echo "${lang_pair}" | cut -d'-' -f2)
+      for l in $src $tgt ; do
+        head -n 2000000 "${raw_dir}/UNPC.${lang_pair}.${l}" > "${raw_dir}/UNPC.${lang_pair}.${l}.2000000"
+      done
     fi
   done
 }

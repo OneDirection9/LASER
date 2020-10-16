@@ -53,7 +53,7 @@ def process_europarl(lang_pairs, alias, verbose=False):
             process(inp_file, out_file, l, bpe_codes, verbose)
 
 
-def process_unpc(lang_pairs, alias, verbose=False):
+def process_unpc(lang_pairs, alias, verbose=False, suffix=None):
     print('Process UNPC (United Nations Parallel Corpus)')
     bpe_codes = get_bpe_codes(alias)
 
@@ -61,11 +61,13 @@ def process_unpc(lang_pairs, alias, verbose=False):
     out_dir = osp.join(LASER, 'data', 'unpc', f'bpe{alias}')
     os.makedirs(out_dir, exist_ok=True)
 
+    suffix = f'.{suffix}' if suffix is not None else ''
+
     for lang_pair in lang_pairs:
         # example: en-zh
         src, tgt = lang_pair.split('-')
         for l in (src, tgt):
-            inp_file = osp.join(raw_dir, f'UNPC.{lang_pair}.{l}')
+            inp_file = osp.join(raw_dir, f'UNPC.{lang_pair}.{l}{suffix}')
             out_file = osp.join(out_dir, f'train.{lang_pair}.{l}')
             print(f' - processing {inp_file}')
             process(inp_file, out_file, l, bpe_codes, verbose)
@@ -78,8 +80,7 @@ def main():
     process_europarl(lang_pairs, args.alias, args.verbose)
 
     lang_pairs = ("en-zh",)
-    # TODO: only use the first 2 million sentences introduce by paper.
-    process_unpc(lang_pairs, args.alias, args.verbose)
+    process_unpc(lang_pairs, args.alias, args.verbose, suffix='2000000')
 
 
 if __name__ == '__main__':
