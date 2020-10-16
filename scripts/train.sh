@@ -11,7 +11,7 @@ checkpoint="${LASER}/checkpoints/laser_lstm"
 mkdir -p "${checkpoint}"
 
 fairseq-train "${data_bin}" \
-  --max-epoch 10 \
+  --max-epoch 17 \
   --ddp-backend=no_c10d \
   --task translation_laser --arch laser \
   --encoder-model-path "${LASER}/models/bilstm.93langs.2018-12-26.pt" \
