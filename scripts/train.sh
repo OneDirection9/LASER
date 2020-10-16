@@ -6,7 +6,7 @@ if [ -z "${LASER}" ]; then
 fi
 
 
-data_bin="${LASER}/data/europarl/binarized"
+data_bin="${LASER}/data/all"
 checkpoint="${LASER}/checkpoints/laser_lstm"
 mkdir -p "${checkpoint}"
 
@@ -16,7 +16,7 @@ fairseq-train "${data_bin}" \
   --task translation_laser --arch laser \
   --encoder-model-path "${LASER}/models/bilstm.93langs.2018-12-26.pt" \
   --fix-encoder \
-  --lang-pairs de-en,de-es,en-es,es-en,fr-en,fr-es \
+  --lang-pairs en-it,it-en,en-zh,zh-en \
   --optimizer adam --adam-betas '(0.9, 0.98)' \
   --lr 0.001 --criterion cross_entropy \
   --dropout 0.1 --save-dir "${checkpoint}" \
