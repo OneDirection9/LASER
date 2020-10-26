@@ -8,7 +8,8 @@ from fairseq.data import (
     LanguagePairDataset,
 )
 from fairseq.tasks import FairseqTask, register_task
-from fairseq.tasks.multilingual_translation import MultilingualTranslationTask, load_langpair_dataset
+from fairseq.tasks.multilingual_translation import MultilingualTranslationTask, \
+    load_langpair_dataset
 
 from .laser_dataset import LaserDataset
 
@@ -62,7 +63,8 @@ class TranslationLaserTask(FairseqTask):
                 (lang_pair, language_pair_dataset(lang_pair))
                 for lang_pair in self.lang_pairs
             ]),
-            eval_key=None if self.training else "%s-%s" % (self.args.source_lang, self.args.target_lang),
+            eval_key=None if self.training else "%s-%s" % (
+            self.args.source_lang, self.args.target_lang),
         )
 
     def build_dataset_for_inference(self, src_tokens, src_lengths):
@@ -81,7 +83,8 @@ class TranslationLaserTask(FairseqTask):
     def build_model(self, args):
         # Check if task args are consistant with model args
         if len(set(self.args.lang_pairs).symmetric_difference(args.lang_pairs)) != 0:
-            raise ValueError('--lang-pairs should include all the language pairs {}.'.format(args.lang_pairs))
+            raise ValueError(
+                '--lang-pairs should include all the language pairs {}.'.format(args.lang_pairs))
 
         from fairseq import models
         model = models.build_model(args, self)
@@ -97,3 +100,8 @@ class TranslationLaserTask(FairseqTask):
     @property
     def target_dictionary(self):
         return self.dicts[self.args.target_lang]
+
+    def inference_step(self, generator, models, sample, prefix_tokens=None, constraints=None):
+        return MultilingualTranslationTask.inference_step(
+            generator, models, sample, prefix_tokens, constraints
+        )
