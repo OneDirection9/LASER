@@ -133,7 +133,7 @@ class LaserEncoder(FairseqEncoder):
         if bidirectional:
             self.output_units *= 2
 
-    def forward(self, src_tokens, src_lengths):
+    def forward(self, src_tokens, src_lengths, decoder_lang):
         if self.left_pad:
             # convert left-padding to right-padding
             src_tokens = utils.convert_padding_direction(
@@ -189,7 +189,20 @@ class LaserEncoder(FairseqEncoder):
         return {
             'sentemb': sentemb,
             'encoder_out': (x, final_hiddens, final_cells),
-            'encoder_padding_mask': encoder_padding_mask if encoder_padding_mask.any() else None
+            'encoder_padding_mask': encoder_padding_mask if encoder_padding_mask.any() else None,
+            'decoder_lang': decoder_lang,
+        }
+
+    def reorder_encoder_out(self, encoder_out, new_order):
+        return {
+            'sentemb': encoder_out['sentemb'].index_select(0, new_order),
+            'encoder_out': (
+                encoder_out['encoder_out'][0].index_select(1, new_order),
+                encoder_out['encoder_out'][1].index_select(1, new_order),
+                encoder_out['encoder_out'][2].index_select(1, new_order),
+            ),
+            'encoder_padding_mask': encoder_out['encoder_padding_mask'].index_select(1, new_order),
+            'decoder_lang': encoder_out['decoder_lang'],
         }
 
 
@@ -236,20 +249,21 @@ class LaserDecoder(FairseqIncrementalDecoder):
         if not self.share_input_output_embed:
             self.fc_out = Linear(out_embed_dim, num_embeddings, dropout=dropout_out)
 
-    def forward(self, prev_output_tokens, encoder_out, lang, incremental_state=None):
+    def forward(self, prev_output_tokens, encoder_out, incremental_state=None):
         x, attn_scores = self.extract_features(
-            prev_output_tokens, encoder_out, lang, incremental_state
+            prev_output_tokens, encoder_out, incremental_state
         )
         return self.output_layer(x), attn_scores
 
     def extract_features(
-        self, prev_output_tokens, encoder_out, lang, incremental_state=None
+        self, prev_output_tokens, encoder_out, incremental_state=None
     ):
         """
         Similar to *forward* but only return features.
         """
         encoder_sentemb = encoder_out['sentemb']
         encoder_padding_mask = encoder_out['encoder_padding_mask']
+        lang = encoder_out['decoder_lang']
         encoder_out = encoder_out['encoder_out']
 
         if incremental_state is not None:

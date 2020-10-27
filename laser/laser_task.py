@@ -101,7 +101,7 @@ class TranslationLaserTask(FairseqTask):
     def target_dictionary(self):
         return self.dicts[self.args.target_lang]
 
-    def inference_step(self, generator, models, sample, prefix_tokens=None, constraints=None):
+    def inference_step(self, generator, models, sample, prefix_tokens=None):
         return MultilingualTranslationTask.inference_step(
-            generator, models, sample, prefix_tokens, constraints
+            self, generator, models, sample, prefix_tokens
         )
