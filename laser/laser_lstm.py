@@ -98,9 +98,8 @@ class LaserModel(FairseqEncoderDecoderModel):
         return cls(encoder, decoder)
 
     def forward(self, src_tokens, src_lengths, prev_output_tokens, decoder_lang, **kwargs):
-        encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, **kwargs)
-        decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, lang=decoder_lang,
-                                   **kwargs)
+        encoder_out = self.encoder(src_tokens, src_lengths=src_lengths, decoder_lang=decoder_lang)
+        decoder_out = self.decoder(prev_output_tokens, encoder_out=encoder_out, **kwargs)
         return decoder_out
 
 
@@ -255,9 +254,7 @@ class LaserDecoder(FairseqIncrementalDecoder):
         )
         return self.output_layer(x), attn_scores
 
-    def extract_features(
-        self, prev_output_tokens, encoder_out, incremental_state=None
-    ):
+    def extract_features(self, prev_output_tokens, encoder_out, incremental_state=None):
         """
         Similar to *forward* but only return features.
         """
