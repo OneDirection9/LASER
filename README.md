@@ -49,7 +49,8 @@ be found in [6], together with an extensive experimental evaluation.
 * download the data used in the example tasks (see description for each task)
 
 ## Training
-1. prepare europarl data by `./scripts/prepare_data.sh`
+0. download data: `./scripts/download_data.sh`
+1. prepare data by `python preprocess.py`
 2. binarize data through fairseq by `./scripts/binarize_data.sh`
 3. train model by `./scirpts/train.sh`
 
