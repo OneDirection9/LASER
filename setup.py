@@ -26,6 +26,7 @@ extras_require = {
     ],
 }
 
+# CFLAGS="-stdlib=libc++" python setup.py develop
 setup(
     name="fairseq-laser",
     version="0.0.1",
