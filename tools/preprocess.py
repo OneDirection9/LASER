@@ -63,12 +63,12 @@ def main():
 
     for name, params in datasets.items():
         print(f"Processing {name}")
+        raw_dir = osp.join(LASER, "data", params["folder"], "raw")
+        oup_dir = osp.join(LASER, "data", params["folder"], f"bpe{args.alias}")
+        os.makedirs(oup_dir, exist_ok=True)
+
         for lang_pair in params["lang_pairs"]:
             src, tgt = lang_pair.split("-")
-            raw_dir = osp.join(LASER, "data", params["folder"], "raw")
-            oup_dir = osp.join(LASER, "data", params["folder"], f"bpe{args.alias}")
-            os.makedirs(oup_dir, exist_ok=True)
-
             for l in (src, tgt):
                 inp_file = osp.join(raw_dir, params["inp_tmpl"].format(lang_pair, l))
                 oup_file = osp.join(oup_dir, params["oup_tmpl"].format(lang_pair, l))
