@@ -11,4 +11,8 @@ tasks/xnli/multinli_1.0*
 .??*swp
 .idea
 
+/data/multinli_1.0*
+/data/XNLI-1.0*
 __pycache__/
+.eggs/
+*.egg-info/
