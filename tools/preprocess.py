@@ -59,6 +59,12 @@ def main():
             "inp_tmpl": "UNPC.{}.{}.2000000",
             "oup_tmpl": "train.{}.{}",
         },
+        "XNLI": {
+            "lang_pairs": ("en1-en2",),
+            "folder": "XNLI-1.0",
+            "inp_tmpl": "xnli.{}.{}",
+            "oup_tmpl": "train.{}.{}",
+        },
     }
 
     for name, params in datasets.items():
