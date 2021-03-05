@@ -74,7 +74,7 @@ def main():
                 oup_file = osp.join(oup_dir, params["oup_tmpl"].format(lang_pair, l))
                 print(f" - processing {inp_file}")
                 # for our task, we use same language as input
-                if len(l) == 3 and l[-1] in {1, 2}:
+                if len(l) == 3 and l[-1] in {"1", "2"}:
                     l = l[:-1]
                 process(inp_file, oup_file, l, bpe_codes, args.verbose)
 
