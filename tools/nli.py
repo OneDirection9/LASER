@@ -7,7 +7,7 @@ import os.path as osp
 from laser.data.utils import LASER
 
 
-def load_nli_jsonl(inp_file: str) -> list:
+def load_nli_jsonl(inp_file: str, language: str) -> list:
     """
     Load entailment sentence pairs from XNLI/MNLI jsonl file.
 
@@ -48,7 +48,7 @@ def load_nli_jsonl(inp_file: str) -> list:
         for line in f:
             example = json.loads(line)
             # XNLI contains 15 different languages and we only use English examples
-            if "language" in example and example["language"] != "en":
+            if "language" in example and example["language"] != language:
                 continue
             # use entailment paris to do training
             if example["gold_label"] != "entailment":
@@ -58,9 +58,7 @@ def load_nli_jsonl(inp_file: str) -> list:
     return res
 
 
-def dump_to_txt(context: list, oup_tmpl: str) -> None:
-    oup_file1 = oup_tmpl.format("e1-e2", "e1")
-    oup_file2 = oup_tmpl.format("e1-e2", "e2")
+def dump_to_txt(context: list, oup_file1: str, oup_file2: str) -> None:
     with open(oup_file1, "w") as f1, open(oup_file2, "w") as f2:
         for example in context:
             f1.write(example["sentence1"])
@@ -72,10 +70,16 @@ def dump_to_txt(context: list, oup_tmpl: str) -> None:
 def main():
     inp_file = osp.join(LASER, "data", "XNLI-1.0", "xnli.dev.jsonl")
 
-    res = load_nli_jsonl(inp_file)
+    language, lang_pair = "en", "en1-en2"
+    src, tgt = lang_pair.split("-")
+
     oup_dir = osp.join(LASER, "data", "XNLI-1.0", "raw")
     os.makedirs(oup_dir, exist_ok=True)
-    dump_to_txt(res, osp.join(oup_dir, "xnli.{}.{}"))
+    oup_file1 = osp.join(oup_dir, f"xnli.{lang_pair}.{src}")
+    oup_file2 = osp.join(oup_dir, f"xnli.{lang_pair}.{tgt}")
+
+    res = load_nli_jsonl(inp_file, language)
+    dump_to_txt(res, oup_file1, oup_file2)
 
 
 if __name__ == "__main__":
