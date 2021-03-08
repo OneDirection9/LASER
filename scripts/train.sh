@@ -6,21 +6,29 @@ if [ -z "${LASER}" ]; then
 fi
 
 
-data_bin="${LASER}/data/all"
-checkpoint="${LASER}/checkpoints/laser_lstm"
-mkdir -p "${checkpoint}"
-
-fairseq-train "${data_bin}" \
-  --max-epoch 17 \
-  --ddp-backend=no_c10d \
-  --task translation_laser --arch laser \
-  --encoder-model-path "${LASER}/models/bilstm.93langs.2018-12-26.pt" \
-  --fix-encoder \
-  --lang-pairs en-it,it-en,en-zh,zh-en \
-  --optimizer adam --adam-betas '(0.9, 0.98)' \
-  --lr 0.001 --criterion cross_entropy \
-  --dropout 0.1 --save-dir "${checkpoint}" \
-  --max-tokens 12000 --fp16 \
-  --valid-subset train --disable-validation \
-  --no-progress-bar --log-interval 1000 \
-  --user-dir laser/
+fairseq-train \
+  "${LASER}/cfgs/laser.json" \
+  --user-dir laser \
+  --log-interval 100 --log-format simple \
+  --task laser --arch laser_lstm \
+  --save-dir . \
+  --optimizer adam \
+  --lr 0.001 \
+  --lr-scheduler inverse_sqrt \
+  --clip-norm 5 \
+  --warmup-updates 90000 \
+  --update-freq 2 \
+  --dropout 0.0 \
+  --encoder-dropout-out 0.1 \
+  --max-tokens 2000 \
+  --max-epoch 50 \
+  --encoder-bidirectional \
+  --encoder-layers 5 \
+  --encoder-hidden-size 512 \
+  --decoder-layers 1 \
+  --decoder-hidden-size 2048 \
+  --encoder-embed-dim 320 \
+  --decoder-embed-dim 320 \
+  --decoder-lang-embed-dim 32 \
+  --warmup-init-lr 0.001 \
+  --disable-validation

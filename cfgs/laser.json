@@ -1,0 +1,56 @@
+{
+  "src_vocab": "./models/93langs.fvocab",
+  "tgt_vocab": "./models/93langs.fvocab",
+  "train": [
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/europarl/binarized/train.en-it.it",
+      "tgt": "./data/europarl/binarized/train.en-it.en"
+    },
+    {
+      "type": "translation",
+      "id": 1,
+      "src": "./data/europarl/binarized/train.en-it.en",
+      "tgt": "./data/europarl/binarized/train.en-it.it"
+    },
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/unpc/binarized/train.en-zh.zh",
+      "tgt": "./data/unpc/binarized/train.en-zh.en"
+    },
+    {
+      "type": "translation",
+      "id": 2,
+      "src": "./data/unpc/binarized/train.en-zh.en",
+      "tgt": "./data/unpc/binarized/train.en-zh.zh"
+    }
+  ],
+  "valid": [
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/tatoeba/binarized/train.cmn-eng.cmn",
+      "tgt": "./data/tatoeba/binarized/train.cmn-eng.eng"
+    },
+    {
+      "type": "translation",
+      "id": 1,
+      "src": "./data/tatoeba/binarized/train.ita-eng.eng",
+      "tgt": "./data/tatoeba/binarized/train.ita-eng.ita"
+    },
+    {
+      "type": "translation",
+      "id": 2,
+      "src": "./data/tatoeba/binarized/train.cmn-eng.eng",
+      "tgt": "./data/tatoeba/binarized/train.cmn-eng.cmn"
+    },
+    {
+      "type": "translation",
+      "id": 2,
+      "src": "./data/tatoeba/binarized/train.ita-eng.ita",
+      "tgt": "./data/tatoeba/binarized/train.ita-eng.eng"
+    }
+  ]
+}
