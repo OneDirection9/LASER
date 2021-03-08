@@ -12,8 +12,7 @@ def get_readme():
 install_requires = [
     "transliterate",
     "jieba",
-    "torch==1.0",
-    "fairseq==0.8.0",
+    "fairseq",  # fairseq has the requirement for torch
 ]
 
 extras_require = {
