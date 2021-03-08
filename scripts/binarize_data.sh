@@ -10,7 +10,7 @@ BPE_VOCAB="${LASER}/models/93langs.fvocab"
 function binarize() {
   bpe="$1"
   data_bin="$2"
-  lang_pairs=("$3")
+  lang_pairs="$3"
 
   for lang_pair in "${lang_pairs[@]}"; do
     src=$(echo "${lang_pair}" | cut -d'-' -f1)
@@ -20,12 +20,16 @@ function binarize() {
         --trainpref "${bpe}/train.${src}-${tgt}" \
         --joined-dictionary --tgtdict "${BPE_VOCAB}" \
         --destdir "${data_bin}" \
+        --dataset-impl lazy \
         --workers 20
   done
 }
 
 lang_pairs=( "en-it" )
-binarize "${LASER}/data/europarl/bpe93" "${LASER}/data/europarl/binarized" "${lang_pairs[@]}"
+binarize "${LASER}/data/europarl/bpe93" "${LASER}/data/europarl/binarized" "${lang_pairs}"
 
 lang_pairs=( "en-zh" )
-binarize "${LASER}/data/unpc/bpe93" "${LASER}/data/unpc/binarized" "${lang_pairs[@]}"
+binarize "${LASER}/data/unpc/bpe93" "${LASER}/data/unpc/binarized" "${lang_pairs}"
+
+lang_pairs=( "cmn-eng" "ita-eng" )
+binarize "${LASER}/data/tatoeba/bpe93" "${LASER}/data/tatoeba/binarized" "${lang_pairs}"
