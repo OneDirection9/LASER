@@ -67,19 +67,27 @@ def dump_to_txt(context: list, oup_file1: str, oup_file2: str) -> None:
             f2.write("\n")
 
 
+def _to_lang_pair(lang):
+    return "{}1-{}2".format(lang, lang)
+
+
 def main():
-    inp_file = osp.join(LASER, "data", "XNLI-1.0", "xnli.dev.jsonl")
+    xnli_root = osp.join(LASER, "data", "XNLI")
 
-    language, lang_pair = "en", "en1-en2"
-    src, tgt = lang_pair.split("-")
-
-    oup_dir = osp.join(LASER, "data", "XNLI-1.0", "raw")
+    xnli_file = osp.join(xnli_root, "xnli.dev.jsonl")
+    oup_dir = osp.join(xnli_root, "raw")
     os.makedirs(oup_dir, exist_ok=True)
-    oup_file1 = osp.join(oup_dir, f"xnli.{lang_pair}.{src}")
-    oup_file2 = osp.join(oup_dir, f"xnli.{lang_pair}.{tgt}")
 
-    res = load_nli_jsonl(inp_file, language)
-    dump_to_txt(res, oup_file1, oup_file2)
+    languages = ("en",)
+    for language in languages:
+        print(" - Loading sentence pair in `{}` language".format(language))
+        lang_pair = _to_lang_pair(language)
+        src, tgt = lang_pair.split("-")
+        oup_file1 = osp.join(oup_dir, f"XNLI.{lang_pair}.{src}")
+        oup_file2 = osp.join(oup_dir, f"XNLI.{lang_pair}.{tgt}")
+
+        res = load_nli_jsonl(xnli_file, language)
+        dump_to_txt(res, oup_file1, oup_file2)
 
 
 if __name__ == "__main__":

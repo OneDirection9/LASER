@@ -52,48 +52,65 @@ LANG_MAP = {
 def main():
     args = parse_args()
 
+    data_root = osp.join(LASER, "data")
     bpe_codes = get_bpe_codes(args.alias)
+
+    def _get_inp_dir(_folder):
+        if _folder == "tatoeba":
+            return osp.join(data_root, _folder, "v1")
+        else:
+            return osp.join(data_root, _folder, "raw")
+
+    def _get_oup_dir(_folder):
+        return osp.join(data_root, _folder, f"bpe{args.alias}")
+
+    def _get_inp_tmpl(_folder):
+        tmpl = str(_folder) + "{}.{}"
+        if _folder == "UNPC":
+            tmpl = tmpl + ".2000000"
+        return tmpl
+
+    def _get_oup_tmpl(_folder):
+        return "train.{}.{}"
+
+    def _get_lang(lang):
+        if lang in LANG_MAP:
+            return LANG_MAP[lang]
+        elif len(lang) == 3 and lang[-1] in {"1", "2"}:  # decode of _to_lang_pair in nli.py
+            return lang[:-1]
+        else:
+            return lang
+
     datasets = {
         "Europarl": {
             "lang_pairs": ("en-it",),
-            "inp_tmpl": "Europarl.{}.{}",
-            "oup_tmpl": "train.{}.{}",
         },
         "UNPC": {
             "lang_pairs": ("en-zh",),
-            "inp_tmpl": "UNPC.{}.{}.2000000",
-            "oup_tmpl": "train.{}.{}",
         },
         "XNLI": {
             "lang_pairs": ("en1-en2",),
-            "inp_tmpl": "xnli.{}.{}",
-            "oup_tmpl": "train.{}.{}",
         },
         "tatoeba": {
             "lang_pairs": ("cmn-eng", "ita-eng"),
-            "inp_tmpl": "tatoeba.{}.{}",
-            "oup_tmpl": "train.{}.{}",
         },
     }
 
-    for name, params in datasets.items():
-        print(f"Processing {name}")
-        raw_dir = osp.join(LASER, "data", name, "raw")
-        oup_dir = osp.join(LASER, "data", name, f"bpe{args.alias}")
+    for folder, params in datasets.items():
+        print(f"Processing {folder}")
+        inp_dir = _get_inp_dir(folder)
+        oup_dir = _get_oup_dir(folder)
         os.makedirs(oup_dir, exist_ok=True)
 
         for lang_pair in params["lang_pairs"]:
             src, tgt = lang_pair.split("-")
             for l in (src, tgt):
-                inp_file = osp.join(raw_dir, params["inp_tmpl"].format(lang_pair, l))
-                oup_file = osp.join(oup_dir, params["oup_tmpl"].format(lang_pair, l))
+                inp_tmpl = _get_inp_tmpl(folder)
+                oup_tmpl = _get_oup_tmpl(folder)
+                inp_file = osp.join(inp_dir, inp_tmpl.format(lang_pair, l))
+                oup_file = osp.join(oup_dir, oup_tmpl.format(lang_pair, l))
                 print(f" - processing {inp_file}")
-                # for our task, we use same language as input
-                if len(l) == 3 and l[-1] in {"1", "2"}:
-                    l = l[:-1]
-                if l in LANG_MAP:
-                    l = LANG_MAP[l]
-                process(inp_file, oup_file, l, bpe_codes, args.verbose)
+                process(inp_file, oup_file, _get_lang(l), bpe_codes, args.verbose)
 
 
 if __name__ == "__main__":
