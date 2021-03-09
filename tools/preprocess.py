@@ -65,7 +65,7 @@ def main():
         return osp.join(data_root, _folder, f"bpe{args.alias}")
 
     def _get_inp_tmpl(_folder):
-        tmpl = str(_folder) + "{}.{}"
+        tmpl = str(_folder) + ".{}.{}"
         if _folder == "UNPC":
             tmpl = tmpl + ".2000000"
         return tmpl
