@@ -49,19 +49,16 @@ def main():
     datasets = {
         "Europarl": {
             "lang_pairs": ("en-it",),
-            "folder": "europarl",
             "inp_tmpl": "Europarl.{}.{}",
             "oup_tmpl": "train.{}.{}",
         },
         "UNPC": {
             "lang_pairs": ("en-zh",),
-            "folder": "unpc",
             "inp_tmpl": "UNPC.{}.{}.2000000",
             "oup_tmpl": "train.{}.{}",
         },
         "XNLI": {
             "lang_pairs": ("en1-en2",),
-            "folder": "XNLI-1.0",
             "inp_tmpl": "xnli.{}.{}",
             "oup_tmpl": "train.{}.{}",
         },
@@ -69,8 +66,8 @@ def main():
 
     for name, params in datasets.items():
         print(f"Processing {name}")
-        raw_dir = osp.join(LASER, "data", params["folder"], "raw")
-        oup_dir = osp.join(LASER, "data", params["folder"], f"bpe{args.alias}")
+        raw_dir = osp.join(LASER, "data", name, "raw")
+        oup_dir = osp.join(LASER, "data", name, f"bpe{args.alias}")
         os.makedirs(oup_dir, exist_ok=True)
 
         for lang_pair in params["lang_pairs"]:

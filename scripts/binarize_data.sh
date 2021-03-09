@@ -15,21 +15,24 @@ function binarize() {
   for lang_pair in "${lang_pairs[@]}"; do
     src=$(echo "${lang_pair}" | cut -d'-' -f1)
     tgt=$(echo "${lang_pair}" | cut -d'-' -f2)
-    /bin/rm "${data_bin}/dict.${src}.txt" "${data_bin}/dict.${tgt}.txt"
+    save_dir="${data_bin}/${lang_pair}"
+    mkdir -p "${save_dir}"
+    /bin/rm "${save_dir}/dict.${src}.txt" "${save_dir}/dict.${tgt}.txt"
     fairseq-preprocess --source-lang "${src}" --target-lang "${tgt}" \
         --trainpref "${bpe}/train.${src}-${tgt}" \
         --joined-dictionary --tgtdict "${BPE_VOCAB}" \
-        --destdir "${data_bin}" \
+        --destdir "${save_dir}" \
         --dataset-impl lazy \
         --workers 20
+    cp -r "${save_dir}" "${data_bin}/${tgt}-${src}"
   done
 }
 
 lang_pairs=( "en-it" )
-binarize "${LASER}/data/europarl/bpe93" "${LASER}/data/europarl/binarized" "${lang_pairs}"
+binarize "${LASER}/data/Europarl/bpe93" "${LASER}/data/Europarl" "${lang_pairs}"
 
 lang_pairs=( "en-zh" )
-binarize "${LASER}/data/unpc/bpe93" "${LASER}/data/unpc/binarized" "${lang_pairs}"
+binarize "${LASER}/data/UNPC/bpe93" "${LASER}/data/UNPC" "${lang_pairs}"
 
 lang_pairs=( "cmn-eng" "ita-eng" )
-binarize "${LASER}/data/tatoeba/bpe93" "${LASER}/data/tatoeba/binarized" "${lang_pairs}"
+binarize "${LASER}/data/tatoeba/bpe93" "${LASER}/data/tatoeba" "${lang_pairs}"

@@ -15,7 +15,7 @@ data_root="${LASER}/data"
 
 DownloadEuroparl() {
   echo "Downloading Europarl"
-  raw_dir="${data_root}/europarl/raw"
+  raw_dir="${data_root}/Europarl/raw"
   mkdir -p "${raw_dir}"
 
   lang_pairs=( "en-it" )
@@ -35,7 +35,7 @@ DownloadEuroparl() {
 
 DownloadUNPC() {
   echo "Downloading UNPC (United Nations Parallel Corpus)"
-  raw_dir="${data_root}/unpc/raw"
+  raw_dir="${data_root}/UNPC/raw"
   mkdir -p "${raw_dir}"
 
   lang_pairs=( "en-zh" )
