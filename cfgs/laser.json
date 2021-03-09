@@ -5,52 +5,52 @@
     {
       "type": "translation",
       "id": 0,
-      "src": "./data/europarl/binarized/train.en-it.it",
-      "tgt": "./data/europarl/binarized/train.en-it.en"
+      "src": "./data/europarl/it-en/train.en-it.it",
+      "tgt": "./data/europarl/it-en/train.en-it.en"
     },
     {
       "type": "translation",
       "id": 1,
-      "src": "./data/europarl/binarized/train.en-it.en",
-      "tgt": "./data/europarl/binarized/train.en-it.it"
+      "src": "./data/europarl/en-it/train.en-it.en",
+      "tgt": "./data/europarl/en-it/train.en-it.it"
     },
     {
       "type": "translation",
       "id": 0,
-      "src": "./data/unpc/binarized/train.en-zh.zh",
-      "tgt": "./data/unpc/binarized/train.en-zh.en"
+      "src": "./data/unpc/zh-en/train.en-zh.zh",
+      "tgt": "./data/unpc/zh-en/train.en-zh.en"
     },
     {
       "type": "translation",
       "id": 2,
-      "src": "./data/unpc/binarized/train.en-zh.en",
-      "tgt": "./data/unpc/binarized/train.en-zh.zh"
+      "src": "./data/unpc/en-zh/train.en-zh.en",
+      "tgt": "./data/unpc/en-zh/train.en-zh.zh"
     }
   ],
   "valid": [
     {
       "type": "translation",
       "id": 0,
-      "src": "./data/tatoeba/binarized/train.cmn-eng.cmn",
-      "tgt": "./data/tatoeba/binarized/train.cmn-eng.eng"
+      "src": "./data/tatoeba/cmn-eng/train.cmn-eng.cmn",
+      "tgt": "./data/tatoeba/cmn-eng/train.cmn-eng.eng"
     },
     {
       "type": "translation",
       "id": 1,
-      "src": "./data/tatoeba/binarized/train.ita-eng.eng",
-      "tgt": "./data/tatoeba/binarized/train.ita-eng.ita"
+      "src": "./data/tatoeba/eng-ita/train.ita-eng.eng",
+      "tgt": "./data/tatoeba/eng-ita/train.ita-eng.ita"
     },
     {
       "type": "translation",
       "id": 2,
-      "src": "./data/tatoeba/binarized/train.cmn-eng.eng",
-      "tgt": "./data/tatoeba/binarized/train.cmn-eng.cmn"
+      "src": "./data/tatoeba/eng-cmn/train.cmn-eng.eng",
+      "tgt": "./data/tatoeba/eng-cmn/train.cmn-eng.cmn"
     },
     {
       "type": "translation",
       "id": 0,
-      "src": "./data/tatoeba/binarized/train.ita-eng.ita",
-      "tgt": "./data/tatoeba/binarized/train.ita-eng.eng"
+      "src": "./data/tatoeba/ita-eng/train.ita-eng.ita",
+      "tgt": "./data/tatoeba/ita-eng/train.ita-eng.eng"
     }
   ]
 }
