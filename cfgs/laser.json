@@ -48,7 +48,7 @@
     },
     {
       "type": "translation",
-      "id": 2,
+      "id": 0,
       "src": "./data/tatoeba/binarized/train.ita-eng.ita",
       "tgt": "./data/tatoeba/binarized/train.ita-eng.eng"
     }
