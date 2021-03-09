@@ -5,26 +5,26 @@
     {
       "type": "translation",
       "id": 0,
-      "src": "./data/europarl/it-en/train.en-it.it",
-      "tgt": "./data/europarl/it-en/train.en-it.en"
+      "src": "./data/Europarl/it-en/train.en-it.it",
+      "tgt": "./data/Europarl/it-en/train.en-it.en"
     },
     {
       "type": "translation",
       "id": 1,
-      "src": "./data/europarl/en-it/train.en-it.en",
-      "tgt": "./data/europarl/en-it/train.en-it.it"
+      "src": "./data/Europarl/en-it/train.en-it.en",
+      "tgt": "./data/Europarl/en-it/train.en-it.it"
     },
     {
       "type": "translation",
       "id": 0,
-      "src": "./data/unpc/zh-en/train.en-zh.zh",
-      "tgt": "./data/unpc/zh-en/train.en-zh.en"
+      "src": "./data/UNPC/zh-en/train.en-zh.zh",
+      "tgt": "./data/UNPC/zh-en/train.en-zh.en"
     },
     {
       "type": "translation",
       "id": 2,
-      "src": "./data/unpc/en-zh/train.en-zh.en",
-      "tgt": "./data/unpc/en-zh/train.en-zh.zh"
+      "src": "./data/UNPC/en-zh/train.en-zh.en",
+      "tgt": "./data/UNPC/en-zh/train.en-zh.zh"
     }
   ],
   "valid": [
