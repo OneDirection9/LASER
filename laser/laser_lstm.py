@@ -3,6 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+import logging
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -14,6 +16,8 @@ from fairseq.models import (
     register_model,
     register_model_architecture,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @register_model("laser_lstm")
@@ -139,6 +143,16 @@ class LSTMModel(FairseqEncoderDecoderModel):
             help="dropout probability for decoder output",
         )
 
+        parser.add_argument(
+            "--encoder-path", type=str, default=None, help="path to pretrained encoder path"
+        )
+        parser.add_argument(
+            "--fixed-encoder", action="store_true", help="keep encoder parameters not updated"
+        )
+        parser.add_argument(
+            "--fixed-decoder", action="store_true", help="keep decoder parameters not updated"
+        )
+
     @classmethod
     def build_model(cls, args, task):
         """Build a new model instance."""
@@ -166,17 +180,21 @@ class LSTMModel(FairseqEncoderDecoderModel):
 
         num_langs = task.num_tasks if hasattr(task, "num_tasks") else 0
 
-        encoder = LSTMEncoder(
-            dictionary=task.source_dictionary,
-            embed_dim=args.encoder_embed_dim,
-            hidden_size=args.encoder_hidden_size,
-            num_layers=args.encoder_layers,
-            dropout_in=args.encoder_dropout_in,
-            dropout_out=args.encoder_dropout_out,
-            bidirectional=args.encoder_bidirectional,
-            pretrained_embed=pretrained_encoder_embed,
-            fixed_embeddings=args.fixed_embeddings,
-        )
+        if args.encoder_path is not None:
+            encoder = LSTMEncoder.from_pretrained(args.encoder_path, task.source_dictionary)
+        else:
+            encoder = LSTMEncoder(
+                dictionary=task.source_dictionary,
+                embed_dim=args.encoder_embed_dim,
+                hidden_size=args.encoder_hidden_size,
+                num_layers=args.encoder_layers,
+                dropout_in=args.encoder_dropout_in,
+                dropout_out=args.encoder_dropout_out,
+                bidirectional=args.encoder_bidirectional,
+                pretrained_embed=pretrained_encoder_embed,
+                fixed_embeddings=args.fixed_embeddings,
+            )
+
         decoder = LSTMDecoder(
             dictionary=task.target_dictionary,
             embed_dim=args.decoder_embed_dim,
@@ -192,6 +210,17 @@ class LSTMModel(FairseqEncoderDecoderModel):
             num_langs=num_langs,
             lang_embed_dim=args.decoder_lang_embed_dim,
         )
+
+        def fix_model(model: torch.nn.Module):
+            logger.info(f"Fixing {model.__class__.__name__} parameters")
+            for p in model.parameters():
+                p.requires_grad = False
+
+        if args.fixed_encoder:
+            fix_model(encoder)
+        if args.fixed_decoder:
+            fix_model(decoder)
+
         return cls(encoder, decoder)
 
 
@@ -326,6 +355,22 @@ class LSTMEncoder(FairseqEncoder):
     def max_positions(self):
         """Maximum input length supported by the encoder."""
         return int(1e5)  # an arbitrary large number
+
+    @classmethod
+    def from_pretrained(cls, model_path, dictionary):
+        logger.info(f"Creating {cls.__name__} from {model_path}")
+        x = torch.load(model_path)
+        params = x["params"]
+
+        logger.info(params)
+        # num_embeddings and padding_idx should be consistent across
+        # model_path, dictionary and params
+        assert len(x["dictionary"]) == len(dictionary) == params.pop("num_embeddings")
+        assert x["dictionary"]["<pad>"] == dictionary.index("<pad>") == params.pop("padding_idx")
+
+        encoder = cls(dictionary, **params)
+        encoder.load_state_dict(x["model"])
+        return encoder
 
 
 class LSTMDecoder(FairseqIncrementalDecoder):

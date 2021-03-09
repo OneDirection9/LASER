@@ -11,6 +11,8 @@ fairseq-train \
   --user-dir laser \
   --log-interval 100 --log-format simple \
   --task laser --arch laser_lstm \
+  --encoder-path "${LASER}/models/bilstm.93langs.2018-12-26.pt" \
+  --fixed-encoder \
   --save-dir . \
   --optimizer adam \
   --lr 0.001 \
@@ -25,9 +27,9 @@ fairseq-train \
   --encoder-bidirectional \
   --encoder-layers 5 \
   --encoder-hidden-size 512 \
+  --encoder-embed-dim 320 \
   --decoder-layers 1 \
   --decoder-hidden-size 2048 \
-  --encoder-embed-dim 320 \
   --decoder-embed-dim 320 \
   --decoder-lang-embed-dim 32 \
   --warmup-init-lr 0.001 \
