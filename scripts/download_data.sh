@@ -37,6 +37,7 @@ DownloadEuroparl() {
   for lang_pair in "${lang_pairs[@]}" ; do
     f="${lang_pair}.txt.zip"
     DownloadAndExtract "${urlpref}/${f}" "${raw_dir}/${f}"
+    /bin/rm "${raw_dir}"/{LICENSE,README}
   done
 }
 
@@ -52,6 +53,7 @@ DownloadUNPC() {
   for lang_pair in "${lang_pairs[@]}" ; do
     f="${lang_pair}.txt.zip"
     DownloadAndExtract "${urlpref}/${f}" "${raw_dir}/${f}"
+    /bin/rm "${raw_dir}"/{LICENSE,README}
 
     src=$(echo "${lang_pair}" | cut -d'-' -f1)
     tgt=$(echo "${lang_pair}" | cut -d'-' -f2)
