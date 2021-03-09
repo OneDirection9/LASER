@@ -42,6 +42,13 @@ def process(inp_file, out_file, lang, bpe_codes, verbose=False):
         BPEfastApply(tmp_file, out_file, bpe_codes, verbose=verbose, over_write=False)
 
 
+LANG_MAP = {
+    "cmn": "zh",
+    "eng": "en",
+    "ita": "it",
+}
+
+
 def main():
     args = parse_args()
 
@@ -62,6 +69,11 @@ def main():
             "inp_tmpl": "xnli.{}.{}",
             "oup_tmpl": "train.{}.{}",
         },
+        "tatoeba": {
+            "lang_pairs": ("cmn-eng", "ita-eng"),
+            "inp_tmpl": "tatoeba.{}.{}",
+            "oup_tmpl": "train.{}.{}",
+        },
     }
 
     for name, params in datasets.items():
@@ -79,6 +91,8 @@ def main():
                 # for our task, we use same language as input
                 if len(l) == 3 and l[-1] in {"1", "2"}:
                     l = l[:-1]
+                if l in LANG_MAP:
+                    l = LANG_MAP[l]
                 process(inp_file, oup_file, l, bpe_codes, args.verbose)
 
 
