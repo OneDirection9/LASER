@@ -604,3 +604,7 @@ def base_architecture(args):
     args.decoder_zero_init = getattr(args, "decoder_zero_init", "0")
     args.decoder_lang_embed_dim = getattr(args, "decoder_lang_embed_dim", 0)
     args.fixed_embeddings = getattr(args, "fixed_embeddings", False)
+
+    args.encoder_path = getattr(args, "encoder_path", None)
+    args.fixed_encoder = getattr(args, "fixed_encoder", False)
+    args.fixed_decoder = getattr(args, "fixed_decoder", False)
