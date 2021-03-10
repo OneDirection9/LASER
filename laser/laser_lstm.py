@@ -41,6 +41,7 @@ class LaserModel(FairseqEncoderDecoderModel):
         parser.add_argument('--encoder-model-path', type=str, default=None,
                             help='path to pretrained model path')
         parser.add_argument('--fix-encoder', action='store_true')
+        parser.add_argument('--fix-decoder', action='store_true')
 
     @classmethod
     def build_model(cls, args, task):
@@ -56,9 +57,12 @@ class LaserModel(FairseqEncoderDecoderModel):
         base_architecture(args)
 
         # Languages index: lang codes into integers
-        lang_dictionary = {
-            task.langs[i]: i for i in range(len(task.langs))
-        }
+        if "en1" in task.langs or "en2" in task.langs:
+            lang_dictionary = { "en1": 0, "en2": 0, "en3": 0, }
+        else:
+            lang_dictionary = {
+                task.langs[i]: i for i in range(len(task.langs))
+            }
 
         if args.encoder_model_path is not None:
             print(f'* Loading parameters from {args.encoder_model_path}')
@@ -71,6 +75,7 @@ class LaserModel(FairseqEncoderDecoderModel):
         else:
             encoder = LaserEncoder(
                 dictionary=task.source_dictionary,
+                padding_idx=task.source_dictionary.pad(),
                 embed_dim=args.encoder_embed_dim,
                 hidden_size=args.encoder_hidden_size,
                 num_layers=args.encoder_layers,
@@ -95,6 +100,10 @@ class LaserModel(FairseqEncoderDecoderModel):
             encoder_output_units=int(args.encoder_hidden_size) * 2,
             lang_embedding_size=args.lang_embedding_size,
         )
+        if args.fix_decoder:
+            print('* Fixing decoder parameters')
+            for p in decoder.parameters():
+                p.requires_grad = False
         return cls(encoder, decoder)
 
     def forward(self, src_tokens, src_lengths, prev_output_tokens, decoder_lang, **kwargs):
@@ -386,3 +395,6 @@ def base_architecture(args):
     args.share_decoder_input_output_embed = getattr(args, 'share_decoder_input_output_embed', False)
     args.share_all_embeddings = getattr(args, 'share_all_embeddings', False)
     args.adaptive_softmax_cutoff = getattr(args, 'adaptive_softmax_cutoff', None)
+
+    args.fix_encoder = getattr(args, 'fix_encoder', False)
+    args.fix_decoder = getattr(args, 'fix_decoder', False)

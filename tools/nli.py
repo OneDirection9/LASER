@@ -68,12 +68,12 @@ def dump_to_txt(context: list, oup_file1: str, oup_file2: str) -> None:
 
 
 def main():
-    inp_file = osp.join(LASER, "data", "XNLI-1.0", "xnli.dev.jsonl")
+    inp_file = osp.join(LASER, "data", "XNLI", "xnli.dev.jsonl")
 
     language, lang_pair = "en", "en1-en2"
     src, tgt = lang_pair.split("-")
 
-    oup_dir = osp.join(LASER, "data", "XNLI-1.0", "raw")
+    oup_dir = osp.join(LASER, "data", "XNLI", "raw")
     os.makedirs(oup_dir, exist_ok=True)
     oup_file1 = osp.join(oup_dir, f"xnli.{lang_pair}.{src}")
     oup_file2 = osp.join(oup_dir, f"xnli.{lang_pair}.{tgt}")

@@ -61,7 +61,7 @@ def main():
         },
         "XNLI": {
             "lang_pairs": ("en1-en2",),
-            "folder": "XNLI-1.0",
+            "folder": "XNLI",
             "inp_tmpl": "xnli.{}.{}",
             "oup_tmpl": "train.{}.{}",
         },

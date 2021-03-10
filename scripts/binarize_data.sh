@@ -10,7 +10,7 @@ BPE_VOCAB="${LASER}/models/93langs.fvocab"
 function binarize() {
   bpe="$1"
   data_bin="$2"
-  lang_pairs=("$3")
+  lang_pairs="$3"
 
   for lang_pair in "${lang_pairs[@]}"; do
     src=$(echo "${lang_pair}" | cut -d'-' -f1)
@@ -25,7 +25,10 @@ function binarize() {
 }
 
 lang_pairs=( "en-it" )
-binarize "${LASER}/data/europarl/bpe93" "${LASER}/data/europarl/binarized" "${lang_pairs[@]}"
+binarize "${LASER}/data/europarl/bpe93" "${LASER}/data/europarl/binarized" "${lang_pairs}"
 
 lang_pairs=( "en-zh" )
-binarize "${LASER}/data/unpc/bpe93" "${LASER}/data/unpc/binarized" "${lang_pairs[@]}"
+binarize "${LASER}/data/unpc/bpe93" "${LASER}/data/unpc/binarized" "${lang_pairs}"
+
+lang_pairs=( "en1-en2" )
+binarize "${LASER}/data/XNLI/bpe93" "${LASER}/data/XNLI/binarized" "${lang_pairs}"

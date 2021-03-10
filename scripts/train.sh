@@ -6,7 +6,7 @@ if [ -z "${LASER}" ]; then
 fi
 
 
-data_bin="${LASER}/data/all"
+data_bin="${LASER}/data/train"
 checkpoint="${LASER}/checkpoints/laser_lstm"
 mkdir -p "${checkpoint}"
 
