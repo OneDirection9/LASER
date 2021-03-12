@@ -209,7 +209,7 @@ class LaserEncoder(FairseqEncoder):
                 encoder_out['encoder_out'][1].index_select(1, new_order),
                 encoder_out['encoder_out'][2].index_select(1, new_order),
             ),
-            'encoder_padding_mask': encoder_out['encoder_padding_mask'].index_select(1, new_order),
+            'encoder_padding_mask': encoder_out['encoder_padding_mask'].index_select(1, new_order) if encoder_out['encoder_padding_mask'] is not None else None,
             'decoder_lang': encoder_out['decoder_lang'],
         }
 
