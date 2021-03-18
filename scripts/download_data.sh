@@ -115,11 +115,24 @@ DownloadXNLI() {
   echo "Downloading XNLI"
 
   url="https://dl.fbaipublicfiles.com/XNLI/XNLI-1.0.zip"
+  xnli_root="${data_root}/XNLI"
 
   DownloadAndUnpack "${url}" "${data_root}/XNLI-1.0.zip"
   /bin/rm -r "${data_root}/__MACOSX"
   /bin/rm "${data_root}/XNLI-1.0/.DS_Store"
-  /bin/mv "${data_root}/XNLI-1.0" "${data_root}/XNLI"
+  /bin/mv "${data_root}/XNLI-1.0" "${xnli_root}"
+
+  save_dir="${xnli_root}/raw"
+  mkdir -p "${save_dir}"
+  langs=( "en" )
+  for lang in "${langs[@]}" ; do
+    src="${lang}1"
+    tgt="${lang}2"
+    src_file="${save_dir}/XNLI.${src}-${tgt}.${src}"
+    tgt_file="${save_dir}/XNLI.${src}-${tgt}.${tgt}"
+    awk -F "\t" -v src_file="${src_file}" -v tgt_file="${tgt_file}" \
+      '{if($1=="en" && $2=="entailment"){print $7 >> src_file; print $8 >> tgt_file}}' "${xnli_root}/xnli.dev.tsv"
+  done
 }
 
 
