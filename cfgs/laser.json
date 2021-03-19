@@ -17,22 +17,34 @@
     {
       "type": "translation",
       "id": 0,
-      "src": "./data/UNPC/zh-en/train.en-zh.zh",
-      "tgt": "./data/UNPC/zh-en/train.en-zh.en"
+      "src": "./data/news-commentary/zh-en/train.en-zh.zh",
+      "tgt": "./data/news-commentary/zh-en/train.en-zh.en"
     },
     {
       "type": "translation",
       "id": 2,
-      "src": "./data/UNPC/en-zh/train.en-zh.en",
-      "tgt": "./data/UNPC/en-zh/train.en-zh.zh"
+      "src": "./data/news-commentary/en-zh/train.en-zh.en",
+      "tgt": "./data/news-commentary/en-zh/train.en-zh.zh"
+    },
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/WikiMatrix/zh-en/train.en-zh.zh",
+      "tgt": "./data/WikiMatrix/zh-en/train.en-zh.en"
+    },
+    {
+      "type": "translation",
+      "id": 2,
+      "src": "./data/WikiMatrix/en-zh/train.en-zh.en",
+      "tgt": "./data/WikiMatrix/en-zh/train.en-zh.zh"
     }
   ],
   "valid": [
     {
       "type": "translation",
       "id": 0,
-      "src": "./data/tatoeba/cmn-eng/train.cmn-eng.cmn",
-      "tgt": "./data/tatoeba/cmn-eng/train.cmn-eng.eng"
+      "src": "./data/tatoeba/zh-en/train.zh-en.zh",
+      "tgt": "./data/tatoeba/zh-en/train.zh-en.en"
     },
     {
       "type": "translation",
@@ -43,8 +55,8 @@
     {
       "type": "translation",
       "id": 2,
-      "src": "./data/tatoeba/eng-cmn/train.cmn-eng.eng",
-      "tgt": "./data/tatoeba/eng-cmn/train.cmn-eng.cmn"
+      "src": "./data/tatoeba/en-zh/train.zh-en.en",
+      "tgt": "./data/tatoeba/en-zh/train.zh-en.zh"
     },
     {
       "type": "translation",
