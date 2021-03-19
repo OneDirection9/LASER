@@ -73,7 +73,7 @@ DownloadWikiMatrix() {
   echo "Downloading Wiki Matrix"
 
   urlpref="http://data.statmt.org/wmt20/translation-task/WikiMatrix"
-  save_dir="${data_root}/WikiMatrix/raw_dir"
+  save_dir="${data_root}/WikiMatrix/raw"
 
   lang_pairs=( "en-zh" )
   for lang_pair in "${lang_pairs[@]}" ; do
