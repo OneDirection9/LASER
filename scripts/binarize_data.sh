@@ -10,7 +10,8 @@ BPE_VOCAB="${LASER}/models/93langs.fvocab"
 function binarize() {
   bpe="$1"
   data_bin="$2"
-  lang_pairs="$3"
+  shift 2
+  lang_pairs=( "$@" )
 
   for lang_pair in "${lang_pairs[@]}"; do
     src=$(echo "${lang_pair}" | cut -d'-' -f1)
@@ -29,10 +30,16 @@ function binarize() {
 }
 
 lang_pairs=( "en-it" )
-binarize "${LASER}/data/Europarl/bpe93" "${LASER}/data/Europarl" "${lang_pairs}"
+binarize "${LASER}/data/Europarl/bpe93" "${LASER}/data/Europarl" "${lang_pairs[@]}"
 
 lang_pairs=( "en-zh" )
-binarize "${LASER}/data/UNPC/bpe93" "${LASER}/data/UNPC" "${lang_pairs}"
+binarize "${LASER}/data/news-commentary/bpe93" "${LASER}/data/news-commentary" "${lang_pairs[@]}"
+
+lang_pairs=( "en-zh" )
+binarize "${LASER}/data/WikiMatrix/bpe93" "${LASER}/data/WikiMatrix" "${lang_pairs[@]}"
+
+lang_pairs=( "en1-en2" )
+binarize "${LASER}/data/XNLI/bpe93" "${LASER}/data/XNLI" "${lang_pairs[@]}"
 
 lang_pairs=( "cmn-eng" "ita-eng" )
-binarize "${LASER}/data/tatoeba/bpe93" "${LASER}/data/tatoeba" "${lang_pairs}"
+binarize "${LASER}/data/tatoeba/bpe93" "${LASER}/data/tatoeba" "${lang_pairs[@]}"
