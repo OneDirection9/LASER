@@ -85,7 +85,10 @@ def main():
         "Europarl": {
             "lang_pairs": ("en-it",),
         },
-        "UNPC": {
+        "news-commentary": {
+            "lang_pairs": ("en-zh",),
+        },
+        "WikiMatrix": {
             "lang_pairs": ("en-zh",),
         },
         "XNLI": {
