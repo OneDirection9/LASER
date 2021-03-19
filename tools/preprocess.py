@@ -95,7 +95,7 @@ def main():
             "lang_pairs": ("en1-en2",),
         },
         "tatoeba": {
-            "lang_pairs": ("cmn-eng", "ita-eng"),
+            "lang_pairs": ("zh-en", "ita-eng"),
         },
     }
 
