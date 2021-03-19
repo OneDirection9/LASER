@@ -12,7 +12,8 @@
       "type": "translation",
       "id": 1,
       "src": "./data/Europarl/en-it/train.en-it.en",
-      "tgt": "./data/Europarl/en-it/train.en-it.it"
+      "tgt": "./data/Europarl/en-it/train.en-it.it",
+      "sample": 2.0
     },
     {
       "type": "translation",
@@ -24,7 +25,8 @@
       "type": "translation",
       "id": 2,
       "src": "./data/news-commentary/en-zh/train.en-zh.en",
-      "tgt": "./data/news-commentary/en-zh/train.en-zh.zh"
+      "tgt": "./data/news-commentary/en-zh/train.en-zh.zh",
+      "sample": 2.0
     },
     {
       "type": "translation",
@@ -36,7 +38,8 @@
       "type": "translation",
       "id": 2,
       "src": "./data/WikiMatrix/en-zh/train.en-zh.en",
-      "tgt": "./data/WikiMatrix/en-zh/train.en-zh.zh"
+      "tgt": "./data/WikiMatrix/en-zh/train.en-zh.zh",
+      "sample": 2.0
     }
   ],
   "valid": [

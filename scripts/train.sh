@@ -13,7 +13,9 @@ fairseq-train \
   --task laser --arch laser_lstm \
   --encoder-path "${LASER}/models/bilstm.93langs.2018-12-26.pt" \
   --fixed-encoder \
-  --save-dir . \
+  --save-dir ./checkpoints/laser_lstm \
+  --tensorboard-logdir ./checkpoints/laser_lstm/log \
+  --fp16 \
   --optimizer adam \
   --lr 0.001 \
   --lr-scheduler inverse_sqrt \
