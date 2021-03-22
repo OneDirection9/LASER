@@ -130,8 +130,8 @@ DownloadXNLI() {
     tgt="${lang}2"
     src_file="${save_dir}/XNLI.${src}-${tgt}.${src}"
     tgt_file="${save_dir}/XNLI.${src}-${tgt}.${tgt}"
-    awk -F "\t" -v src_file="${src_file}" -v tgt_file="${tgt_file}" \
-      '{if($1=="en" && $2=="entailment"){print $7 >> src_file; print $8 >> tgt_file}}' "${xnli_root}/xnli.dev.tsv"
+    awk -F "\t" -v src_file="${src_file}" -v tgt_file="${tgt_file}" -v lang=${lang} \
+      '{if($1==lang && $2=="entailment"){print $7 >> src_file; print $8 >> tgt_file}}' "${xnli_root}/xnli.dev.tsv"
   done
 }
 
