@@ -11,7 +11,7 @@ fairseq-train \
   --user-dir laser \
   --log-interval 100 --log-format simple \
   --task laser --arch laser_lstm \
-  --encoder-path "${LASER}/models/bilstm.93langs.2018-12-26.pt" \
+  --encoder-path "models/bilstm.93langs.2018-12-26.pt" \
   --fixed-encoder \
   --save-dir ./checkpoints/laser_lstm \
   --tensorboard-logdir ./checkpoints/laser_lstm/log \

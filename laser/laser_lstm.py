@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import logging
+import os.path as osp
 
 import torch
 import torch.nn as nn
@@ -144,7 +145,10 @@ class LSTMModel(FairseqEncoderDecoderModel):
         )
 
         parser.add_argument(
-            "--encoder-path", type=str, default=None, help="path to pretrained encoder path"
+            "--encoder-path",
+            type=str,
+            default=None,
+            help="relative path to pretrained encoder path relative to LASER",
         )
         parser.add_argument(
             "--fixed-encoder", action="store_true", help="keep encoder parameters not updated"
@@ -358,6 +362,10 @@ class LSTMEncoder(FairseqEncoder):
 
     @classmethod
     def from_pretrained(cls, model_path, dictionary):
+        from .data.utils import LASER
+
+        model_path = osp.join(LASER, model_path)
+
         logger.info(f"Creating {cls.__name__} from {model_path}")
         x = torch.load(model_path)
         params = x["params"]
