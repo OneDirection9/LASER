@@ -13,6 +13,7 @@ from fairseq import models, options
 from fairseq.data import Dictionary, FairseqDataset, IndexedDataset, LanguagePairDataset, data_utils
 from fairseq.tasks import LegacyFairseqTask, register_task
 
+from .data.utils import LASER
 from .multitask_data_utils import MultidatasetEpochBatchIterator, MultitaskDatasetWrapper
 
 logger = logging.getLogger(__name__)
@@ -69,7 +70,7 @@ class LaserTask(LegacyFairseqTask):
 
     @classmethod
     def setup_task(cls, args, **kwargs):
-        with open(args.configfile, "r") as f:
+        with open(os.path.join(LASER, args.configfile), "r") as f:
             config = json.load(f)
         num_tasks = max(dataset["id"] for dataset in config["train"]) + 1
 

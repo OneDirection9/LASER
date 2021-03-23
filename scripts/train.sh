@@ -7,7 +7,7 @@ fi
 
 
 fairseq-train \
-  "${LASER}/cfgs/laser.json" \
+  "cfgs/laser.json" \
   --user-dir laser \
   --log-interval 100 --log-format simple \
   --task laser --arch laser_lstm \
