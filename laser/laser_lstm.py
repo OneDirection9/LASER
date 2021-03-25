@@ -38,8 +38,8 @@ class LSTMModel(FairseqEncoderDecoderModel):
     ):
         assert target_language_id is not None
 
-        src_encoder_out = self.encoder(src_tokens, src_lengths, dataset_name)
-        return self.decoder(prev_output_tokens, src_encoder_out, lang_id=target_language_id)
+        src_encoder_out = self.encoder(src_tokens, src_lengths, dataset_name, target_language_id)
+        return self.decoder(prev_output_tokens, src_encoder_out)
 
     @staticmethod
     def add_args(parser):
@@ -275,7 +275,7 @@ class LSTMEncoder(FairseqEncoder):
         if bidirectional:
             self.output_units *= 2
 
-    def forward(self, src_tokens, src_lengths, dataset_name):
+    def forward(self, src_tokens, src_lengths, dataset_name, target_language_id):
         if self.left_pad:
             # convert left-padding to right-padding
             src_tokens = utils.convert_padding_direction(
@@ -343,6 +343,7 @@ class LSTMEncoder(FairseqEncoder):
             "sentemb": sentemb,
             "encoder_out": (x, final_hiddens, final_cells),
             "encoder_padding_mask": encoder_padding_mask if encoder_padding_mask.any() else None,
+            "target_language_id": target_language_id,
         }
 
     def reorder_encoder_out(self, encoder_out_dict, new_order):
@@ -438,16 +439,17 @@ class LSTMDecoder(FairseqIncrementalDecoder):
             self.embed_lang = nn.Embedding(num_langs, lang_embed_dim)
             nn.init.uniform_(self.embed_lang.weight, -0.1, 0.1)
 
-    def forward(self, prev_output_tokens, encoder_out_dict, incremental_state=None, lang_id=0):
-        sentemb = encoder_out_dict["sentemb"]
-        encoder_out = encoder_out_dict["encoder_out"]
+    def forward(self, prev_output_tokens, encoder_out, incremental_state=None):
+        sentemb = encoder_out["sentemb"]
+        _encoder_out = encoder_out["encoder_out"]
+        lang_id = encoder_out["target_language_id"]
 
         if incremental_state is not None:
             prev_output_tokens = prev_output_tokens[:, -1:]
         bsz, seqlen = prev_output_tokens.size()
 
         # get outputs from encoder
-        encoder_outs, _, _ = encoder_out[:3]
+        encoder_outs, _, _ = _encoder_out[:3]
         srclen = encoder_outs.size(0)
 
         # embed tokens
