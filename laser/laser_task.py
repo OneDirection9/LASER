@@ -111,10 +111,6 @@ class LaserTask(LegacyFairseqTask):
 
         pair_datasets = OrderedDict()
 
-        if split == "valid":
-            self.datasets[split] = pair_datasets
-            return
-
         if split not in self.config:
             raise FileNotFoundError("Dataset not found in config file: {}".format(split))
 

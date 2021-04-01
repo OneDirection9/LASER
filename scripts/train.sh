@@ -30,8 +30,8 @@ fairseq-train \
   --encoder-layers 5 \
   --encoder-hidden-size 512 \
   --encoder-embed-dim 320 \
-  --decoder-layers 5 \
-  --decoder-hidden-size 512 \
+  --decoder-layers 1 \
+  --decoder-hidden-size 2048 \
   --decoder-embed-dim 320 \
   --decoder-lang-embed-dim 32 \
   --warmup-init-lr 0.001 \
