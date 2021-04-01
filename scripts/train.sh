@@ -5,6 +5,7 @@ if [ -z "${LASER}" ]; then
   exit
 fi
 
+save_dir="${LASER}/checkpoints/laser_lstm"
 
 fairseq-train \
   "cfgs/laser.json" \
@@ -13,8 +14,8 @@ fairseq-train \
   --task laser --arch laser_lstm \
   --encoder-path "models/bilstm.93langs.2018-12-26.pt" \
   --fixed-encoder \
-  --save-dir ./checkpoints/laser_lstm \
-  --tensorboard-logdir ./checkpoints/laser_lstm/log \
+  --save-dir "${save_dir}" \
+  --tensorboard-logdir "${save_dir}/log" \
   --fp16 \
   --optimizer adam \
   --lr 0.001 \
