@@ -136,9 +136,33 @@ DownloadXNLI() {
 }
 
 
+DownloadSNLI() {
+  echo "Downloading SNLI"
+
+  url="https://nlp.stanford.edu/projects/snli/snli_1.0.zip"
+  snli_root="${data_root}/snli"
+
+  DownloadAndUnpack "${url}" "${data_root}/snli_1.0.zip"
+  /bin/rm -r "${data_root}/__MACOSX"
+  /bin/mv "${data_root}/snli_1.0" "${snli_root}"
+
+  save_dir="${snli_root}/raw"
+  mkdir -p "${save_dir}"
+  lang="en"
+  src="${lang}1"
+  tgt="${lang}2"
+  src_file="${save_dir}/snli.${src}-${tgt}.${src}"
+  tgt_file="${save_dir}/snli.${src}-${tgt}.${tgt}"
+  awk -F "\t" -v src_file="${src_file}" -v tgt_file="${tgt_file}" \
+    '{if($1=="entailment"){print $6 >> src_file; print $7 >> tgt_file}}' "${snli_root}/snli_1.0_train.txt"
+  done
+}
+
+
 DownloadEuroparl
 DownloadNewsCommentary
 DownloadWikiMatrix
 DownloadXNLI
+DownloadSNLI
 
 echo "Done!!!"
