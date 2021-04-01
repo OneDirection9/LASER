@@ -94,6 +94,9 @@ def main():
         "XNLI": {
             "lang_pairs": ("en1-en2",),
         },
+        "snli": {
+            "lang_pairs": ("en1-en2",),
+        }
         "tatoeba": {
             "lang_pairs": ("zh-en", "ita-eng"),
         },

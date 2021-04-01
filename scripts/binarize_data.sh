@@ -41,5 +41,8 @@ binarize "${LASER}/data/WikiMatrix/bpe93" "${LASER}/data/WikiMatrix" "${lang_pai
 lang_pairs=( "en1-en2" )
 binarize "${LASER}/data/XNLI/bpe93" "${LASER}/data/XNLI" "${lang_pairs[@]}"
 
+lang_pairs=( "en1-en2" )
+binarize "${LASER}/data/snli/bpe93" "${LASER}/data/snli" "${lang_pairs[@]}"
+
 lang_pairs=( "zh-en" "ita-eng" )
 binarize "${LASER}/data/tatoeba/bpe93" "${LASER}/data/tatoeba" "${lang_pairs[@]}"

@@ -144,6 +144,7 @@ DownloadSNLI() {
 
   DownloadAndUnpack "${url}" "${data_root}/snli_1.0.zip"
   /bin/rm -r "${data_root}/__MACOSX"
+  /bin/rm "${data_root}/snli_1.0/.DS_Store"
   /bin/mv "${data_root}/snli_1.0" "${snli_root}"
 
   save_dir="${snli_root}/raw"
@@ -155,7 +156,6 @@ DownloadSNLI() {
   tgt_file="${save_dir}/snli.${src}-${tgt}.${tgt}"
   awk -F "\t" -v src_file="${src_file}" -v tgt_file="${tgt_file}" \
     '{if($1=="entailment"){print $6 >> src_file; print $7 >> tgt_file}}' "${snli_root}/snli_1.0_train.txt"
-  done
 }
 
 
