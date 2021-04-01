@@ -18,6 +18,8 @@ from fairseq.models import (
     register_model_architecture,
 )
 
+from .data.utils import LASER
+
 logger = logging.getLogger(__name__)
 
 
@@ -148,7 +150,13 @@ class LSTMModel(FairseqEncoderDecoderModel):
             "--encoder-path",
             type=str,
             default=None,
-            help="relative path to pretrained encoder path relative to LASER",
+            help="relative path to pretrained encoder model relative to LASER",
+        )
+        parser.add_argument(
+            "--laser-path",
+            type=str,
+            default=None,
+            help="relative path to pretrained laser model relative to LASER"
         )
         parser.add_argument(
             "--fixed-encoder", action="store_true", help="keep encoder parameters not updated"
@@ -184,20 +192,23 @@ class LSTMModel(FairseqEncoderDecoderModel):
 
         num_langs = task.num_tasks if hasattr(task, "num_tasks") else 0
 
+        assert args.encoder_path is None or args.laser_path is None, \
+            "can't set encoder_path and laser_path together"
+
+        encoder = LSTMEncoder(
+            dictionary=task.source_dictionary,
+            embed_dim=args.encoder_embed_dim,
+            hidden_size=args.encoder_hidden_size,
+            num_layers=args.encoder_layers,
+            dropout_in=args.encoder_dropout_in,
+            dropout_out=args.encoder_dropout_out,
+            bidirectional=args.encoder_bidirectional,
+            pretrained_embed=pretrained_encoder_embed,
+            fixed_embeddings=args.fixed_embeddings,
+        )
+
         if args.encoder_path is not None:
-            encoder = LSTMEncoder.from_pretrained(args.encoder_path, task.source_dictionary)
-        else:
-            encoder = LSTMEncoder(
-                dictionary=task.source_dictionary,
-                embed_dim=args.encoder_embed_dim,
-                hidden_size=args.encoder_hidden_size,
-                num_layers=args.encoder_layers,
-                dropout_in=args.encoder_dropout_in,
-                dropout_out=args.encoder_dropout_out,
-                bidirectional=args.encoder_bidirectional,
-                pretrained_embed=pretrained_encoder_embed,
-                fixed_embeddings=args.fixed_embeddings,
-            )
+            encoder = cls.load_pretrained(encoder, args.encoder_path, strict=True)
 
         decoder = LSTMDecoder(
             dictionary=task.target_dictionary,
@@ -225,7 +236,21 @@ class LSTMModel(FairseqEncoderDecoderModel):
         if args.fixed_decoder:
             fix_model(decoder)
 
-        return cls(encoder, decoder)
+        laser = cls(encoder, decoder)
+
+        if args.laser_path is not None:
+            laser = cls.load_pretrained(laser, args.laser_path)
+
+        return laser
+
+    @staticmethod
+    def load_pretrained(model: nn.Module, pretrained_path, strict=False) -> nn.Module:
+        model_path = osp.join(LASER, pretrained_path)
+        logger.info(f"Creating {model.__class__.__name__} from {model_path}")
+        x = torch.load(model_path)
+
+        model.load_state_dict(x["model"], strict=strict)
+        return model
 
 
 class LSTMEncoder(FairseqEncoder):
@@ -360,26 +385,6 @@ class LSTMEncoder(FairseqEncoder):
     def max_positions(self):
         """Maximum input length supported by the encoder."""
         return int(1e5)  # an arbitrary large number
-
-    @classmethod
-    def from_pretrained(cls, model_path, dictionary):
-        from .data.utils import LASER
-
-        model_path = osp.join(LASER, model_path)
-
-        logger.info(f"Creating {cls.__name__} from {model_path}")
-        x = torch.load(model_path)
-        params = x["params"]
-
-        logger.info(params)
-        # num_embeddings and padding_idx should be consistent across
-        # model_path, dictionary and params
-        assert len(x["dictionary"]) == len(dictionary) == params.pop("num_embeddings")
-        assert x["dictionary"]["<pad>"] == dictionary.index("<pad>") == params.pop("padding_idx")
-
-        encoder = cls(dictionary, **params)
-        encoder.load_state_dict(x["model"])
-        return encoder
 
 
 class LSTMDecoder(FairseqIncrementalDecoder):
@@ -616,5 +621,6 @@ def base_architecture(args):
     args.fixed_embeddings = getattr(args, "fixed_embeddings", False)
 
     args.encoder_path = getattr(args, "encoder_path", None)
+    args.laser_path = getattr(args, "laser_path", None)
     args.fixed_encoder = getattr(args, "fixed_encoder", False)
     args.fixed_decoder = getattr(args, "fixed_decoder", False)
