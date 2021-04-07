@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import logging
+import math
 import os.path as osp
 
 import torch
@@ -156,7 +157,7 @@ class LSTMModel(FairseqEncoderDecoderModel):
             "--laser-path",
             type=str,
             default=None,
-            help="relative path to pretrained laser model relative to LASER"
+            help="relative path to pretrained laser model relative to LASER",
         )
         parser.add_argument(
             "--fixed-encoder", action="store_true", help="keep encoder parameters not updated"
@@ -192,8 +193,9 @@ class LSTMModel(FairseqEncoderDecoderModel):
 
         num_langs = task.num_tasks if hasattr(task, "num_tasks") else 0
 
-        assert args.encoder_path is None or args.laser_path is None, \
-            "can't set encoder_path and laser_path together"
+        assert (
+            args.encoder_path is None or args.laser_path is None
+        ), "can't set encoder_path and laser_path together"
 
         encoder = LSTMEncoder(
             dictionary=task.source_dictionary,
@@ -566,6 +568,50 @@ class LSTMDecoder(FairseqIncrementalDecoder):
     def max_positions(self):
         """Maximum output length supported by the decoder."""
         return int(1e5)  # an arbitrary large number
+
+
+class PositionalEncoding(nn.Module):
+    r"""Inject some information about the relative or absolute position of the tokens
+        in the sequence. The positional encodings have the same dimension as
+        the embeddings, so that the two can be summed. Here, we use sine and cosine
+        functions of different frequencies.
+    .. math::
+        \text{PosEncoder}(pos, 2i) = sin(pos/10000^(2i/d_model))
+        \text{PosEncoder}(pos, 2i+1) = cos(pos/10000^(2i/d_model))
+        \text{where pos is the word position and i is the embed idx)
+    Args:
+        d_model: the embed dim (required).
+        dropout: the dropout value (default=0.1).
+        max_len: the max. length of the incoming sequence (default=5000).
+    Examples:
+        >>> pos_encoder = PositionalEncoding(d_model)
+    """
+
+    def __init__(self, d_model, dropout=0.1, max_len=5000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(p=dropout)
+
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0).transpose(0, 1)
+        self.register_buffer("pe", pe)
+
+    def forward(self, x):
+        r"""Inputs of forward function
+        Args:
+            x: the sequence fed to the positional encoder model (required).
+        Shape:
+            x: [sequence length, batch size, embed dim]
+            output: [sequence length, batch size, embed dim]
+        Examples:
+            >>> output = pos_encoder(x)
+        """
+
+        x = x + self.pe[: x.size(0), :]
+        return self.dropout(x)
 
 
 def Embedding(num_embeddings, embedding_dim, padding_idx):
