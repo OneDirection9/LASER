@@ -73,6 +73,7 @@ class LaserTask(LegacyFairseqTask):
         with open(os.path.join(LASER, args.configfile), "r") as f:
             config = json.load(f)
         num_tasks = max(dataset["id"] for dataset in config["train"]) + 1
+        num_tasks = 3
 
         args.left_pad_source = options.eval_bool(args.left_pad_source)
         args.left_pad_target = options.eval_bool(args.left_pad_target)

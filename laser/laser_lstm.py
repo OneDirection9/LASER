@@ -165,6 +165,9 @@ class LSTMModel(FairseqEncoderDecoderModel):
         parser.add_argument(
             "--fixed-decoder", action="store_true", help="keep decoder parameters not updated"
         )
+        parser.add_argument(
+            "--num-controller-layers", type=int, default=0, help="number of controller layers"
+        )
 
     @classmethod
     def build_model(cls, args, task):
@@ -207,6 +210,7 @@ class LSTMModel(FairseqEncoderDecoderModel):
             bidirectional=args.encoder_bidirectional,
             pretrained_embed=pretrained_encoder_embed,
             fixed_embeddings=args.fixed_embeddings,
+            num_controller_layers=args.num_controller_layers,
         )
 
         if args.encoder_path is not None:
@@ -228,13 +232,15 @@ class LSTMModel(FairseqEncoderDecoderModel):
             lang_embed_dim=args.decoder_lang_embed_dim,
         )
 
-        def fix_model(model: torch.nn.Module):
+        def fix_model(model: torch.nn.Module, exclusive=None):
             logger.info(f"Fixing {model.__class__.__name__} parameters")
-            for p in model.parameters():
+            for n, p in model.named_parameters():
+                if exclusive is not None and n.startswith(exclusive):
+                    continue
                 p.requires_grad = False
 
         if args.fixed_encoder:
-            fix_model(encoder)
+            fix_model(encoder, "controller")
         if args.fixed_decoder:
             fix_model(decoder)
 
@@ -271,6 +277,7 @@ class LSTMEncoder(FairseqEncoder):
         pretrained_embed=None,
         padding_value=0.0,
         fixed_embeddings=False,
+        num_controller_layers=0,
     ):
         super().__init__(dictionary)
         self.num_layers = num_layers
@@ -301,6 +308,9 @@ class LSTMEncoder(FairseqEncoder):
         self.output_units = hidden_size
         if bidirectional:
             self.output_units *= 2
+
+        if num_controller_layers > 0:
+            self.controller = NNController(d_model=self.output_units, dropout=dropout_out)
 
     def forward(self, src_tokens, src_lengths, dataset_name, target_language_id):
         if self.left_pad:
@@ -337,7 +347,9 @@ class LSTMEncoder(FairseqEncoder):
 
         # unpack outputs and apply dropout
         x, _ = nn.utils.rnn.pad_packed_sequence(packed_outs, padding_value=self.padding_value)
-        x = F.dropout(x, p=self.dropout_out, training=self.training)
+        if self.controller is None:
+            # controller has dropout in PositionalEncoding
+            x = F.dropout(x, p=self.dropout_out, training=self.training)
         assert list(x.size()) == [seqlen, bsz, self.output_units]
 
         if self.bidirectional:
@@ -357,6 +369,10 @@ class LSTMEncoder(FairseqEncoder):
             final_cells = combine_bidir(final_cells)
 
         encoder_padding_mask = src_tokens.eq(self.padding_idx).t()
+
+        if self.controller is not None:
+            padding_mask = src_tokens.eq(self.padding_idx)
+            x = self.controller(x, src_key_padding_mask=padding_mask)
 
         # Set padded outputs to -inf so they are not selected by max-pooling
         padding_mask = src_tokens.eq(self.padding_idx).t().unsqueeze(-1)
@@ -718,3 +734,4 @@ def base_architecture(args):
     args.laser_path = getattr(args, "laser_path", None)
     args.fixed_encoder = getattr(args, "fixed_encoder", False)
     args.fixed_decoder = getattr(args, "fixed_decoder", False)
+    args.num_controller_layers = getattr(args, "num_controller_layers", 0)

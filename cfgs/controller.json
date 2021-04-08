@@ -1,0 +1,44 @@
+{
+  "src_vocab": "./models/93langs.fvocab",
+  "tgt_vocab": "./models/93langs.fvocab",
+  "train": [
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/snli/en1-en2/train.en1-en2.en1",
+      "tgt": "./data/snli/en1-en2/train.en1-en2.en2"
+    },
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/snli/en2-en1/train.en1-en2.en1",
+      "tgt": "./data/snli/en2-en1/train.en1-en2.en2"
+    }
+  ],
+  "valid": [
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/tatoeba/zh-en/train.zh-en.zh",
+      "tgt": "./data/tatoeba/zh-en/train.zh-en.en"
+    },
+    {
+      "type": "translation",
+      "id": 1,
+      "src": "./data/tatoeba/eng-ita/train.ita-eng.eng",
+      "tgt": "./data/tatoeba/eng-ita/train.ita-eng.ita"
+    },
+    {
+      "type": "translation",
+      "id": 2,
+      "src": "./data/tatoeba/en-zh/train.zh-en.en",
+      "tgt": "./data/tatoeba/en-zh/train.zh-en.zh"
+    },
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/tatoeba/ita-eng/train.ita-eng.ita",
+      "tgt": "./data/tatoeba/ita-eng/train.ita-eng.eng"
+    }
+  ]
+}
