@@ -96,7 +96,7 @@ def main():
         },
         "snli": {
             "lang_pairs": ("en1-en2",),
-        }
+        },
         "tatoeba": {
             "lang_pairs": ("zh-en", "ita-eng"),
         },
