@@ -5,7 +5,7 @@ if [ -z "${LASER}" ]; then
   exit
 fi
 
-save_dir="${LASER}/checkpoints/laser_lstm"
+save_dir="${LASER}/checkpoints/controller"
 
 fairseq-train \
   "cfgs/controller.json" \
