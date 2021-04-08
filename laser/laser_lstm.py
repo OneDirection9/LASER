@@ -570,6 +570,54 @@ class LSTMDecoder(FairseqIncrementalDecoder):
         return int(1e5)  # an arbitrary large number
 
 
+class NNController(nn.Module):
+    def __init__(
+        self,
+        max_len: int = 5000,
+        d_model: int = 512,
+        nhead: int = 8,
+        num_encoder_layers: int = 1,
+        dim_feedforward: int = 2048,
+        dropout: float = 0.1,
+        activation: str = "relu",
+    ):
+        super(NNController, self).__init__()
+
+        self.positional_encoding = PositionalEncoding(d_model, dropout, max_len)
+
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model, nhead, dim_feedforward, dropout, activation
+        )
+        encoder_norm = nn.LayerNorm(d_model)
+        self.encoder = nn.TransformerEncoder(encoder_layer, num_encoder_layers, encoder_norm)
+
+        self.d_model = d_model
+        self.nhead = nhead
+
+        self._reset_parameters()
+
+    def _reset_parameters(self):
+        r"""Initiate parameters in the transformer model."""
+
+        for p in self.parameters():
+            if p.dim() > 1:
+                nn.init.xavier_uniform_(p)
+
+    def forward(self, src, mask=None, src_key_padding_mask=None):
+        """
+        Args:
+            src: [sequence length, batch size, embed dim].
+            mask:
+            src_key_padding_mask: :math:`(S, N)`.
+
+        Returns:
+
+        """
+        src = src + self.positional_encoding(src)
+        x = self.encoder(src, mask=mask, src_key_padding_mask=src_key_padding_mask)
+        return x
+
+
 class PositionalEncoding(nn.Module):
     r"""Inject some information about the relative or absolute position of the tokens
         in the sequence. The positional encodings have the same dimension as
