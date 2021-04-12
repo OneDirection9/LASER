@@ -25,6 +25,8 @@ DownloadAndUnpack() {
   echo " - Unpacking ${save_file}"
   if [ "${save_file:(-4)}" == ".zip" ] ; then
     unzip -q "${save_file}" -d "${save_dir}"
+  elif [ "${save_file:(-7)}" == ".tar.gz" ] || [ "${save_file:(-4}" == ".tgz" ] ; then
+    tar -zxf "${save_file}" -C "${save_dir}"
   elif [ "${save_file:(-3)}" == ".gz" ] ; then
     gzip -d -c "${save_file}" > "${save_file%.gz}"
   fi
@@ -87,6 +89,18 @@ DownloadWikiMatrix() {
     awk -F "\t" -v src_file="${src_file}" -v tgt_file="${tgt_file}" \
       '{if($4=="en" && $5=="zh"){print $2 >> src_file; print $3 >> tgt_file}}' "${save_dir}/${f%.gz}"
   done
+}
+
+
+DownloadCommonCrawl() {
+  echo "Downloading Common Crawl"
+
+  url="http://statmt.org/wmt13/training-parallel-commoncrawl.tgz"
+  save_dir="${data_root}/commoncrawl/raw"
+
+  DownloadAndUnpack "${url}" "${save_dir}/training-parallel-commoncrawl.tgz"
+  /bin/cp "${save_dir}/commoncrawl.de-en.en" "${save_dir}/commoncrawl.en1-en2.en1"
+  /bin/cp "${save_dir}/commoncrawl.de-en.en" "${save_dir}/commoncrawl.en1-en2.en2"
 }
 
 
