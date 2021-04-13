@@ -25,7 +25,7 @@ DownloadAndUnpack() {
   echo " - Unpacking ${save_file}"
   if [ "${save_file:(-4)}" == ".zip" ] ; then
     unzip -q "${save_file}" -d "${save_dir}"
-  elif [ "${save_file:(-7)}" == ".tar.gz" ] || [ "${save_file:(-4}" == ".tgz" ] ; then
+  elif [ "${save_file:(-7)}" == ".tar.gz" ] || [ "${save_file:(-4)}" == ".tgz" ] ; then
     tar -zxf "${save_file}" -C "${save_dir}"
   elif [ "${save_file:(-3)}" == ".gz" ] ; then
     gzip -d -c "${save_file}" > "${save_file%.gz}"
@@ -86,8 +86,8 @@ DownloadWikiMatrix() {
     tgt=$(echo "${lang_pair}" | cut -d'-' -f2)
     src_file="${save_dir}/WikiMatrix.${lang_pair}.${src}"
     tgt_file="${save_dir}/WikiMatrix.${lang_pair}.${tgt}"
-    awk -F "\t" -v src_file="${src_file}" -v tgt_file="${tgt_file}" \
-      '{if($4=="en" && $5=="zh"){print $2 >> src_file; print $3 >> tgt_file}}' "${save_dir}/${f%.gz}"
+    awk -F "\t" -v src_file="${src_file}" -v tgt_file="${tgt_file}" -v src=${src} -v tgt=${tgt}\
+      '{if($4==src && $5==tgt){print $2 >> src_file; print $3 >> tgt_file}}' "${save_dir}/${f%.gz}"
   done
 }
 
