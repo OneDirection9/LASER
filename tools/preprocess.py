@@ -91,6 +91,18 @@ def main():
         "WikiMatrix": {
             "lang_pairs": ("en-zh",),
         },
+        "mt": {
+            "lang_pairs": ("en-zh",),
+        },
+        "UNPC": {
+            "lang_pairs": ("en-zh",),
+        },
+        "news-crawl": {
+            "lang_pairs": ("zh1-zh2",),
+        },
+        "news-discuss": {
+            "lang_pairs": ("en1-en2",),
+        },
         "XNLI": {
             "lang_pairs": ("en1-en2",),
         },

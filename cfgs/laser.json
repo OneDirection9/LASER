@@ -25,8 +25,7 @@
       "type": "translation",
       "id": 2,
       "src": "./data/news-commentary/en-zh/train.en-zh.en",
-      "tgt": "./data/news-commentary/en-zh/train.en-zh.zh",
-      "sample": 2.0
+      "tgt": "./data/news-commentary/en-zh/train.en-zh.zh"
     },
     {
       "type": "translation",
@@ -38,8 +37,31 @@
       "type": "translation",
       "id": 2,
       "src": "./data/WikiMatrix/en-zh/train.en-zh.en",
-      "tgt": "./data/WikiMatrix/en-zh/train.en-zh.zh",
-      "sample": 2.0
+      "tgt": "./data/WikiMatrix/en-zh/train.en-zh.zh"
+    },
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/mt/zh-en/train.en-zh.zh",
+      "tgt": "./data/mt/zh-en/train.en-zh.en"
+    },
+    {
+      "type": "translation",
+      "id": 2,
+      "src": "./data/mt/en-zh/train.en-zh.en",
+      "tgt": "./data/mt/en-zh/train.en-zh.zh"
+    },
+    {
+      "type": "translation",
+      "id": 2,
+      "src": "./data/news-crawl/zh1-zh2/train.zh1-zh2.zh1",
+      "tgt": "./data/news-crawl/zh1-zh2/train.zh1-zh2.zh2"
+    },
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/news-discuss/en1-en2/train.en1-en2.en1",
+      "src": "./data/news-discuss/en1-en2/train.en1-en2.en2"
     }
   ],
   "valid": [

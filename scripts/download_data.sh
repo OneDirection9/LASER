@@ -202,6 +202,7 @@ DownloadSNLI() {
 DownloadEuroparl
 DownloadNewsCommentary
 DownloadWikiMatrix
+DownloadUNPC
 DownloadNewsCrawl
 DownloadNewsDiscuss
 DownloadXNLI
