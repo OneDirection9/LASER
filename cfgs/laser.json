@@ -12,8 +12,7 @@
       "type": "translation",
       "id": 1,
       "src": "./data/Europarl/en-it/train.en-it.en",
-      "tgt": "./data/Europarl/en-it/train.en-it.it",
-      "sample": 2.0
+      "tgt": "./data/Europarl/en-it/train.en-it.it"
     },
     {
       "type": "translation",
