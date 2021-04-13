@@ -127,8 +127,26 @@ DownloadNewsCrawl() {
     f="news.${year}.${lang}.shuffled.deduped.gz"
     DownloadAndUnpack "${urlpref}/${lang}/${f}" "${save_dir}/${f}"
 
-    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news-crawl.${year}.${lang}1-${lang}2.${lang}1"
-    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news-crawl.${year}.${lang}1-${lang}2.${lang}2"
+    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news-crawl.${lang}1-${lang}2.${lang}1"
+    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news-crawl.${lang}1-${lang}2.${lang}2"
+  done
+}
+
+
+DownloadNewsDiscuss() {
+  echo "Downloading News Discussions"
+
+  urlpref="http://data.statmt.org/news-discussions/en/"
+  save_dir="${data_root}/news-discuss/raw"
+
+  langs=( "en" )
+  year="2019"
+  for lang in "${langs[@]}" ; do
+    f="news-discuss.${year}.${lang}.filtered.gz"
+    DownloadAndUnpack "${urlpref}/${lang}/${f}" "${save_dir}/${f}"
+
+    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news-discuss.${lang}1-${lang}2.${lang}1"
+    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news-discuss.${lang}1-${lang}2.${lang}2"
   done
 }
 
@@ -185,6 +203,7 @@ DownloadEuroparl
 DownloadNewsCommentary
 DownloadWikiMatrix
 DownloadNewsCrawl
+DownloadNewsDiscuss
 DownloadXNLI
 DownloadSNLI
 
