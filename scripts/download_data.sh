@@ -92,18 +92,6 @@ DownloadWikiMatrix() {
 }
 
 
-DownloadCommonCrawl() {
-  echo "Downloading Common Crawl"
-
-  url="http://statmt.org/wmt13/training-parallel-commoncrawl.tgz"
-  save_dir="${data_root}/commoncrawl/raw"
-
-  DownloadAndUnpack "${url}" "${save_dir}/training-parallel-commoncrawl.tgz"
-  /bin/cp "${save_dir}/commoncrawl.de-en.en" "${save_dir}/commoncrawl.en1-en2.en1"
-  /bin/cp "${save_dir}/commoncrawl.de-en.en" "${save_dir}/commoncrawl.en1-en2.en2"
-}
-
-
 DownloadUNPC() {
   echo "Downloading UNPC (United Nations Parallel Corpus)"
 
@@ -121,6 +109,26 @@ DownloadUNPC() {
     for l in $src $tgt ; do
       head -n 2000000 "${save_dir}/UNPC.${lang_pair}.${l}" > "${save_dir}/UNPC.${lang_pair}.${l}.2000000"
     done
+  done
+}
+
+
+# Monolingual dataset
+
+DownloadNewsCrawl() {
+  echo "Downloading News Crawl"
+
+  urlpref="http://data.statmt.org/news-crawl"
+  save_dir="${data_root}/news/raw"
+  langs=( "zh" )
+  year="2020"
+
+  for lang in "${langs[@]}" ; do
+    f="news.${year}.${lang}.shuffled.deduped.gz"
+    DownloadAndUnpack "${urlpref}/${lang}/${f}" "${save_dir}/${f}"
+
+    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news.${year}.${lang}1-${lang}2.${lang}1"
+    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news.${year}.${lang}1-${lang}2.${lang}2"
   done
 }
 
@@ -176,6 +184,7 @@ DownloadSNLI() {
 DownloadEuroparl
 DownloadNewsCommentary
 DownloadWikiMatrix
+DownloadNewsCrawl
 DownloadXNLI
 DownloadSNLI
 
