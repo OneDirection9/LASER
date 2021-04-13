@@ -136,7 +136,7 @@ DownloadNewsCrawl() {
 DownloadNewsDiscuss() {
   echo "Downloading News Discussions"
 
-  urlpref="http://data.statmt.org/news-discussions/en/"
+  urlpref="http://data.statmt.org/news-discussions"
   save_dir="${data_root}/news-discuss/raw"
 
   langs=( "en" )
