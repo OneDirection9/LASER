@@ -119,7 +119,7 @@ DownloadNewsCrawl() {
   echo "Downloading News Crawl"
 
   urlpref="http://data.statmt.org/news-crawl"
-  save_dir="${data_root}/news/raw"
+  save_dir="${data_root}/news-crawl/raw"
   langs=( "zh" )
   year="2020"
 
@@ -127,8 +127,8 @@ DownloadNewsCrawl() {
     f="news.${year}.${lang}.shuffled.deduped.gz"
     DownloadAndUnpack "${urlpref}/${lang}/${f}" "${save_dir}/${f}"
 
-    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news.${year}.${lang}1-${lang}2.${lang}1"
-    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news.${year}.${lang}1-${lang}2.${lang}2"
+    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news-crawl.${year}.${lang}1-${lang}2.${lang}1"
+    head -n 2000000 "${save_dir}/${f%.gz}" > "${save_dir}/news-crawl.${year}.${lang}1-${lang}2.${lang}2"
   done
 }
 
