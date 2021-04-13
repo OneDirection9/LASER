@@ -61,7 +61,7 @@
       "type": "translation",
       "id": 0,
       "src": "./data/news-discuss/en1-en2/train.en1-en2.en1",
-      "src": "./data/news-discuss/en1-en2/train.en1-en2.en2"
+      "tgt": "./data/news-discuss/en1-en2/train.en1-en2.en2"
     }
   ],
   "valid": [
