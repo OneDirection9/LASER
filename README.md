@@ -54,6 +54,32 @@ be found in [6], together with an extensive experimental evaluation.
 2. binarize data through fairseq by `./scripts/binarize_data.sh`
 3. train model by `./scirpts/train.sh`
 
+## ParlAI Persona-chat dataset format
+
+There are four possible scenarios:
+1. conditioning on no persona
+2. your own persona
+3. their persona
+4. both persona
+
+The format of the `none` file is as follows:
+```
+1 x1<tab>y1<tab><tab>candidate1|candidate2|candidate3
+2 x2<tab>y2<tab><tab>candidateA|candidate2B|candidateC
+...
+```
+
+candidate1/2/3/A/B/C are only useful for ranking models.
+
+The format of the `none_no_cands` file is as follows:
+```
+1 x1<tab>y1<tab>
+2 x2<tab>y2<tab>
+...
+```
+
+For other (e.g. `both`) files, there are additional persona above the dialog.
+
 ## Applications
 
 We showcase several applications of multilingual sentence embeddings
