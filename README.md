@@ -78,7 +78,20 @@ The format of the `none_no_cands` file is as follows:
 ...
 ```
 
-For other (e.g. `both`) files, there are additional persona above the dialog.
+The format of the `both` file is as follows:
+```
+1 your persona: i love to redesign houses.
+2 your persona: killing for sport is my hobby.
+3 your persona: i shot an arrow the other day !.
+4 your persona: i like to get dressed up.
+5 partner's persona: my favorite hobbies are based on old fashioned life skills.
+6 partner's persona: i race large felines who are in captivity to remain healthy.
+7 partner's persona: i was a really good runner when i was younger.
+8 partner's persona: i am a carnivore.
+9 hi , how are you doing ? i'm getting ready to do some cheetah chasing to stay in shape .  you must be very fast . hunting is one of my favorite hobbies .
+```
+
+where the "your persona" messages are the persona of <person 1> and "hello, how are you doing ? i'm getting ready to do some cheetah chasing to stay in shape" is being said to <person 1> by , say.
 
 ## Applications
 
