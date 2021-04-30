@@ -4,25 +4,28 @@ import os
 import os.path as osp
 
 # get environment
-assert os.environ.get('LASER'), 'Please set the environment variable LASER'
-LASER = os.environ['LASER']
+assert os.environ.get("LASER"), "Please set the environment variable LASER"
+LASER = os.environ["LASER"]
 
 ALIAS_TO_CHECKPOINT_NAME = {
-    '21': 'bilstm.eparl21.2018-11-19.pt',
-    '93': 'bilstm.93langs.2018-12-26.pt',
+    "21": "bilstm.eparl21.2018-11-19.pt",
+    "93": "bilstm.93langs.2018-12-26.pt",
 }
 
 ALIAS_TO_BPE_CODES_NAME = {
-    '21': 'eparl21.fcodes',
-    '93': '93langs.fcodes',
+    "21": "eparl21.fcodes",
+    "93": "93langs.fcodes",
 }
 
 ALIAS_TO_VOCAB_NAME = {
-    '21': 'eparl21.fvocab',
-    '93': '93langs.fvocab',
+    "21": "eparl21.fvocab",
+    "93": "93langs.fvocab",
 }
 
-MODEL_DIR = osp.join(LASER, 'models')
+MODEL_DIR = osp.join(LASER, "models")
+
+# a special character indicting the start of the persona
+PERSONA_SEP_CHAR = "😈"
 
 
 def get_checkpoint(alias: str) -> str:
