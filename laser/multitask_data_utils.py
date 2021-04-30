@@ -6,7 +6,7 @@
 from collections import OrderedDict
 
 import numpy as np
-from fairseq.data import BaseWrapperDataset, FairseqDataset, iterators
+from fairseq.data import BaseWrapperDataset, FairseqDataset, LanguagePairDataset, iterators
 
 
 class MultiItr(object):
@@ -138,3 +138,8 @@ class MultitaskDatasetWrapper(BaseWrapperDataset):
 
     def prefetch(self, indices):
         return self.dataset.prefetch(indices)
+
+
+class DialogDataset(LanguagePairDataset):
+    def __getitem__(self, index):
+        return super().__getitem__(index)

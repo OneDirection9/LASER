@@ -10,11 +10,15 @@ import os
 from collections import OrderedDict, defaultdict
 
 from fairseq import models, options
-from fairseq.data import Dictionary, FairseqDataset, IndexedDataset, LanguagePairDataset, data_utils
+from fairseq.data import Dictionary, FairseqDataset, IndexedDataset, data_utils
 from fairseq.tasks import LegacyFairseqTask, register_task
 
 from .data.utils import LASER
-from .multitask_data_utils import MultidatasetEpochBatchIterator, MultitaskDatasetWrapper
+from .multitask_data_utils import (
+    DialogDataset,
+    MultidatasetEpochBatchIterator,
+    MultitaskDatasetWrapper,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -137,7 +141,7 @@ class LaserTask(LegacyFairseqTask):
             else:
                 tgt_dataset = None
 
-            dataset = LanguagePairDataset(
+            dataset = DialogDataset(
                 src_dataset,
                 src_dataset.sizes,
                 self.src_dictionary,
