@@ -26,6 +26,7 @@ MODEL_DIR = osp.join(LASER, "models")
 
 # a special character indicting the start of the persona
 PERSONA_SEP_CHAR = "😈"
+PERSONA_SEP_CHAR_IDX = 73640
 
 
 def get_checkpoint(alias: str) -> str:

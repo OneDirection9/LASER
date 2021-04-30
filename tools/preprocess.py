@@ -112,6 +112,9 @@ def main():
         "tatoeba": {
             "lang_pairs": ("zh-en", "ita-eng"),
         },
+        "convai2": {
+            "lang_pairs": ("en1-en2",),
+        },
     }
 
     for folder, params in datasets.items():

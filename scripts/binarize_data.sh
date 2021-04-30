@@ -23,6 +23,7 @@ function binarize() {
     mkdir -p "${save_dir}"
     /bin/rm "${save_dir}/dict.${src}.txt" "${save_dir}/dict.${tgt}.txt"
     fairseq-preprocess --source-lang "${src}" --target-lang "${tgt}" \
+        --user-dir laser --task laser \
         --trainpref "${bpe}/train.${src}-${tgt}" \
         --joined-dictionary --tgtdict "${BPE_VOCAB}" \
         --destdir "${save_dir}" \
@@ -62,3 +63,6 @@ binarize "${LASER}/data/snli/bpe93" "${LASER}/data/snli" "${lang_pairs[@]}"
 
 lang_pairs=( "zh-en" "ita-eng" )
 binarize "${LASER}/data/tatoeba/bpe93" "${LASER}/data/tatoeba" "${lang_pairs[@]}"
+
+lang_pairs=( "en1-en2" )
+binarize "${LASER}/data/convai2/bpe93" "${LASER}/data/convai2" "${lang_pairs[@]}"
