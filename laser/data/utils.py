@@ -25,8 +25,15 @@ ALIAS_TO_VOCAB_NAME = {
 MODEL_DIR = osp.join(LASER, "models")
 
 # a special character indicting the start of the persona
+# see tools/convai2.py
 PERSONA_SEP_CHAR = "😈"
-PERSONA_SEP_CHAR_IDX = 73640
+# TODO: handle PERSONA_SEP_CHAR in dictionary
+# To avoid encode PERSONA_SEP_CHAR to UNK word, I add it to
+# the last line of 93langs.fvocab temporarily and manually.
+# So the PERSONA_SEP_CHAR will be encoded to `73640`.
+# After that remove PERSONA_SEP_CHAR from fvocab, to avoid
+# size mismatch between model and checkpoint.
+PERSONA_SEP_CHAR_ID = 73640
 
 
 def get_checkpoint(alias: str) -> str:
