@@ -350,7 +350,7 @@ class LSTMEncoder(FairseqEncoder):
 
         # unpack outputs and apply dropout
         x, _ = nn.utils.rnn.pad_packed_sequence(packed_outs, padding_value=self.padding_value)
-        if hasattr(self, "controller"):
+        if not hasattr(self, "controller"):
             # controller has dropout in PositionalEncoding
             x = F.dropout(x, p=self.dropout_out, training=self.training)
         assert list(x.size()) == [seqlen, bsz, self.output_units]
@@ -639,7 +639,7 @@ class NNController(nn.Module):
         Returns:
 
         """
-        src = src + self.positional_encoding(src)
+        src = self.positional_encoding(src)
         x = self.encoder(src, mask=mask, src_key_padding_mask=src_key_padding_mask)
         return x
 
