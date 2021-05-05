@@ -37,11 +37,14 @@ class LSTMModel(FairseqEncoderDecoderModel):
         tgt_tokens=None,
         tgt_lengths=None,
         target_language_id=None,
+        personas_list=None,
         dataset_name="",
     ):
         assert target_language_id is not None
 
-        src_encoder_out = self.encoder(src_tokens, src_lengths, dataset_name, target_language_id)
+        src_encoder_out = self.encoder(
+            src_tokens, src_lengths, dataset_name, target_language_id, personas_list
+        )
         return self.decoder(prev_output_tokens, src_encoder_out)
 
     @staticmethod
@@ -312,7 +315,7 @@ class LSTMEncoder(FairseqEncoder):
         if num_controller_layers > 0:
             self.controller = NNController(d_model=self.output_units, dropout=dropout_out)
 
-    def forward(self, src_tokens, src_lengths, dataset_name, target_language_id):
+    def forward(self, src_tokens, src_lengths, dataset_name, target_language_id, personas_list):
         if self.left_pad:
             # convert left-padding to right-padding
             src_tokens = utils.convert_padding_direction(
@@ -381,6 +384,13 @@ class LSTMEncoder(FairseqEncoder):
 
         # Build the sentence embedding by max-pooling over the encoder outputs
         sentemb = x.max(dim=0)[0]
+
+        def embed_personas(personas):
+            # [T,] -> [T, d] -> [d,]
+            personas = [self.embed_tokens(persona).mean(dim=0) for persona in personas]
+            return torch.stack(personas, dim=0)
+
+        # embed_personas_list = [embed_personas(personas) for personas in personas_list]
 
         return {
             "sentemb": sentemb,

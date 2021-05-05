@@ -32,6 +32,8 @@ def convert(inp_file: str, src_file: str, tgt_file: str):
 
 
 if __name__ == "__main__":
+    # persona distribution:
+    #     3: 107; 4: 8811; 5: 8959
     convert(
         "./data/convai2/train_both_original_no_cands.txt",
         "./data/convai2/raw/convai2.en1-en2.en1",

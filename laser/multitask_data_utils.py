@@ -6,7 +6,11 @@
 from collections import OrderedDict
 
 import numpy as np
+import torch
 from fairseq.data import BaseWrapperDataset, FairseqDataset, LanguagePairDataset, iterators
+from fairseq.data.language_pair_dataset import collate
+
+from .data.utils import PERSONA_SEP_CHAR_ID
 
 
 class MultiItr(object):
@@ -142,4 +146,111 @@ class MultitaskDatasetWrapper(BaseWrapperDataset):
 
 class DialogDataset(LanguagePairDataset):
     def __getitem__(self, index):
-        return super().__getitem__(index)
+        tgt_item = self.tgt[index] if self.tgt is not None else None
+        src_item = self.src[index]
+
+        # Separate out the persona list
+        # The original src_item has following format:
+        #     dialog <SEP> persona <SEP> persona <SEP>...
+        sep_ind = (src_item == PERSONA_SEP_CHAR_ID).nonzero(as_tuple=True)[0]
+        start = sep_ind + 1
+        end = torch.cat([sep_ind[1:], sep_ind.new_tensor([src_item.numel()])])
+        personas = [src_item[s:e] for s, e in zip(start, end)]
+        src_item = src_item[: sep_ind[0]]
+
+        # Append EOS to end of tgt sentence if it does not have an EOS and remove
+        # EOS from end of src sentence if it exists. This is useful when we use
+        # use existing datasets for opposite directions i.e., when we want to
+        # use tgt_dataset as src_dataset and vice versa
+        if self.append_eos_to_target:
+            eos = self.tgt_dict.eos() if self.tgt_dict else self.src_dict.eos()
+            if self.tgt and self.tgt[index][-1] != eos:
+                tgt_item = torch.cat([self.tgt[index], torch.LongTensor([eos])])
+
+        if self.append_bos:
+            bos = self.tgt_dict.bos() if self.tgt_dict else self.src_dict.bos()
+            if self.tgt and self.tgt[index][0] != bos:
+                tgt_item = torch.cat([torch.LongTensor([bos]), self.tgt[index]])
+
+            bos = self.src_dict.bos()
+            if self.src[index][0] != bos:
+                src_item = torch.cat([torch.LongTensor([bos]), self.src[index]])
+
+        if self.remove_eos_from_source:
+            eos = self.src_dict.eos()
+            if self.src[index][-1] == eos:
+                src_item = self.src[index][:-1]
+
+        example = {
+            "id": index,
+            "source": src_item,
+            "target": tgt_item,
+            "personas": personas,
+        }
+        if self.align_dataset is not None:
+            example["alignment"] = self.align_dataset[index]
+        if self.constraints is not None:
+            example["constraints"] = self.constraints[index]
+        return example
+
+    def collater(self, samples, pad_to_length=None):
+        """Merge a list of samples to form a mini-batch.
+
+        Args:
+            samples (List[dict]): samples to collate
+            pad_to_length (dict, optional): a dictionary of
+                {'source': source_pad_to_length, 'target': target_pad_to_length}
+                to indicate the max length to pad to in source and target respectively.
+
+        Returns:
+            dict: a mini-batch with the following keys:
+
+                - `id` (LongTensor): example IDs in the original input order
+                - `ntokens` (int): total number of tokens in the batch
+                - `net_input` (dict): the input to the Model, containing keys:
+
+                  - `src_tokens` (LongTensor): a padded 2D Tensor of tokens in
+                    the source sentence of shape `(bsz, src_len)`. Padding will
+                    appear on the left if *left_pad_source* is ``True``.
+                  - `src_lengths` (LongTensor): 1D Tensor of the unpadded
+                    lengths of each source sentence of shape `(bsz)`
+                  - `prev_output_tokens` (LongTensor): a padded 2D Tensor of
+                    tokens in the target sentence, shifted right by one
+                    position for teacher forcing, of shape `(bsz, tgt_len)`.
+                    This key will not be present if *input_feeding* is
+                    ``False``.  Padding will appear on the left if
+                    *left_pad_target* is ``True``.
+                  - `src_lang_id` (LongTensor): a long Tensor which contains source
+                    language IDs of each sample in the batch
+
+                - `target` (LongTensor): a padded 2D Tensor of tokens in the
+                  target sentence of shape `(bsz, tgt_len)`. Padding will appear
+                  on the left if *left_pad_target* is ``True``.
+                - `tgt_lang_id` (LongTensor): a long Tensor which contains target language
+                   IDs of each sample in the batch
+        """
+        personas_list = [sample.pop("personas") for sample in samples]
+        res = collate(
+            samples,
+            pad_idx=self.src_dict.pad(),
+            eos_idx=self.eos,
+            left_pad_source=self.left_pad_source,
+            left_pad_target=self.left_pad_target,
+            input_feeding=self.input_feeding,
+            pad_to_length=pad_to_length,
+            pad_to_multiple=self.pad_to_multiple,
+        )
+        if self.src_lang_id is not None or self.tgt_lang_id is not None:
+            src_tokens = res["net_input"]["src_tokens"]
+            bsz = src_tokens.size(0)
+            if self.src_lang_id is not None:
+                res["net_input"]["src_lang_id"] = (
+                    torch.LongTensor([[self.src_lang_id]]).expand(bsz, 1).to(src_tokens)
+                )
+            if self.tgt_lang_id is not None:
+                res["tgt_lang_id"] = (
+                    torch.LongTensor([[self.tgt_lang_id]]).expand(bsz, 1).to(src_tokens)
+                )
+
+        res["net_input"]["personas_list"] = personas_list
+        return res
