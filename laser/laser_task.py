@@ -143,7 +143,7 @@ class LaserTask(LegacyFairseqTask):
             else:
                 tgt_dataset = None
 
-            data_cls = DialogDataset if self.args.is_dislog else LanguagePairDataset
+            data_cls = DialogDataset if self.args.is_dialog else LanguagePairDataset
             dataset = data_cls(
                 src_dataset,
                 src_dataset.sizes,
