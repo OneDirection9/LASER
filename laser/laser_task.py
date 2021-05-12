@@ -10,7 +10,7 @@ import os
 from collections import OrderedDict, defaultdict
 
 from fairseq import models, options
-from fairseq.data import Dictionary, FairseqDataset, IndexedDataset, data_utils
+from fairseq.data import Dictionary, FairseqDataset, IndexedDataset, LanguagePairDataset, data_utils
 from fairseq.tasks import LegacyFairseqTask, register_task
 
 from .data.utils import LASER
@@ -64,6 +64,8 @@ class LaserTask(LegacyFairseqTask):
             metavar="N",
             help="max number of tokens in the target sequence",
         )
+
+        parser.add_argument("--is-dialog", action="store_true", help="where using dialog dataset")
 
     def __init__(self, args, config, src_dictionary, tgt_dictionary, num_tasks):
         super().__init__(args)
@@ -141,7 +143,8 @@ class LaserTask(LegacyFairseqTask):
             else:
                 tgt_dataset = None
 
-            dataset = DialogDataset(
+            data_cls = DialogDataset if self.args.is_dislog else LanguagePairDataset
+            dataset = data_cls(
                 src_dataset,
                 src_dataset.sizes,
                 self.src_dictionary,

@@ -315,7 +315,9 @@ class LSTMEncoder(FairseqEncoder):
         if num_controller_layers > 0:
             self.controller = NNController(d_model=self.output_units, dropout=dropout_out)
 
-    def forward(self, src_tokens, src_lengths, dataset_name, target_language_id, personas_list):
+    def forward(
+        self, src_tokens, src_lengths, dataset_name, target_language_id, personas_list=None
+    ):
         if self.left_pad:
             # convert left-padding to right-padding
             src_tokens = utils.convert_padding_direction(
@@ -634,7 +636,7 @@ class NNController(nn.Module):
         Args:
             src: [sequence length, batch size, embed dim].
             mask:
-            src_key_padding_mask: :math:`(S, N)`.
+            src_key_padding_mask: :math:`(N, S)`.
 
         Returns:
 
@@ -686,6 +688,13 @@ class PositionalEncoding(nn.Module):
 
         x = x + self.pe[: x.size(0), :]
         return self.dropout(x)
+
+
+class PersonaEmbedding(nn.Module):
+    def __init__(self, d_model, hidden_dim, embed_dim):
+        super(PersonaEmbedding, self).__init__()
+
+        self.linear1 = nn.Linear()
 
 
 def Embedding(num_embeddings, embedding_dim, padding_idx):
