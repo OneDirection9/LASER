@@ -12,7 +12,7 @@ fairseq-train \
   --user-dir laser \
   --log-interval 100 --log-format simple \
   --task laser --arch laser_lstm \
-  --laser-path "checkpoints/checkpoint40.pt" \
+  --laser-path "checkpoints/checkpoint25.pt" \
   --fixed-encoder \
   --fixed-decoder \
   --save-dir "${save_dir}" \
@@ -26,7 +26,7 @@ fairseq-train \
   --update-freq 2 \
   --dropout 0.0 \
   --encoder-dropout-out 0.1 \
-  --num-controller-layers 1 \
+  --ff-dim 2048 \
   --max-tokens 2000 \
   --max-epoch 50 \
   --encoder-bidirectional \
