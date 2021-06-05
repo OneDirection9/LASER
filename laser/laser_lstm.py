@@ -4,7 +4,6 @@
 # LICENSE file in the root directory of this source tree.
 
 import logging
-import math
 import os.path as osp
 
 import torch
@@ -168,9 +167,7 @@ class LSTMModel(FairseqEncoderDecoderModel):
         parser.add_argument(
             "--fixed-decoder", action="store_true", help="keep decoder parameters not updated"
         )
-        parser.add_argument(
-            "--num-controller-layers", type=int, default=0, help="number of controller layers"
-        )
+        parser.add_argument("--ff-dim", type=int, default=0, help="number of ff dim")
 
     @classmethod
     def build_model(cls, args, task):
@@ -213,7 +210,7 @@ class LSTMModel(FairseqEncoderDecoderModel):
             bidirectional=args.encoder_bidirectional,
             pretrained_embed=pretrained_encoder_embed,
             fixed_embeddings=args.fixed_embeddings,
-            num_controller_layers=args.num_controller_layers,
+            ff_dim=args.ff_dim,
         )
 
         if args.encoder_path is not None:
@@ -280,7 +277,7 @@ class LSTMEncoder(FairseqEncoder):
         pretrained_embed=None,
         padding_value=0.0,
         fixed_embeddings=False,
-        num_controller_layers=0,
+        ff_dim=0,
     ):
         super().__init__(dictionary)
         self.num_layers = num_layers
@@ -312,8 +309,8 @@ class LSTMEncoder(FairseqEncoder):
         if bidirectional:
             self.output_units *= 2
 
-        if num_controller_layers > 0:
-            self.controller = NNController(d_model=self.output_units, dropout=dropout_out)
+        if ff_dim > 0:
+            self.controller = BriefController(self.output_units, ff_dim, dropout_out)
 
     def forward(
         self, src_tokens, src_lengths, dataset_name, target_language_id, personas_list=None
@@ -352,9 +349,7 @@ class LSTMEncoder(FairseqEncoder):
 
         # unpack outputs and apply dropout
         x, _ = nn.utils.rnn.pad_packed_sequence(packed_outs, padding_value=self.padding_value)
-        if not hasattr(self, "controller"):
-            # controller has dropout in PositionalEncoding
-            x = F.dropout(x, p=self.dropout_out, training=self.training)
+        x = F.dropout(x, p=self.dropout_out, training=self.training)
         assert list(x.size()) == [seqlen, bsz, self.output_units]
 
         if self.bidirectional:
@@ -375,10 +370,6 @@ class LSTMEncoder(FairseqEncoder):
 
         encoder_padding_mask = src_tokens.eq(self.padding_idx).t()
 
-        if hasattr(self, "controller"):
-            padding_mask = src_tokens.eq(self.padding_idx)
-            x = self.controller(x, src_key_padding_mask=padding_mask)
-
         # Set padded outputs to -inf so they are not selected by max-pooling
         padding_mask = src_tokens.eq(self.padding_idx).t().unsqueeze(-1)
         if padding_mask.any():
@@ -386,13 +377,8 @@ class LSTMEncoder(FairseqEncoder):
 
         # Build the sentence embedding by max-pooling over the encoder outputs
         sentemb = x.max(dim=0)[0]
-
-        def embed_personas(personas):
-            # [T,] -> [T, d] -> [d,]
-            personas = [self.embed_tokens(persona).mean(dim=0) for persona in personas]
-            return torch.stack(personas, dim=0)
-
-        # embed_personas_list = [embed_personas(personas) for personas in personas_list]
+        if hasattr(self, "controller"):
+            sentemb = self.controller(sentemb)
 
         return {
             "sentemb": sentemb,
@@ -598,96 +584,30 @@ class LSTMDecoder(FairseqIncrementalDecoder):
         return int(1e5)  # an arbitrary large number
 
 
-class NNController(nn.Module):
+class BriefController(nn.Module):
     def __init__(
         self,
-        max_len: int = 5000,
-        d_model: int = 512,
-        nhead: int = 8,
-        num_encoder_layers: int = 1,
-        dim_feedforward: int = 2048,
-        dropout: float = 0.1,
-        activation: str = "relu",
-    ):
-        super(NNController, self).__init__()
+        d_model,
+        dim_feedforward=2048,
+        dropout=0.1,
+        activation="relu",
+    ) -> None:
+        super(BriefController, self).__init__()
 
-        self.positional_encoding = PositionalEncoding(d_model, dropout, max_len)
+        self.linear1 = nn.Linear(d_model, dim_feedforward)
+        self.linear2 = nn.Linear(dim_feedforward, d_model)
 
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model, nhead, dim_feedforward, dropout, activation
-        )
-        encoder_norm = nn.LayerNorm(d_model)
-        self.encoder = nn.TransformerEncoder(encoder_layer, num_encoder_layers, encoder_norm)
+        self.norm = nn.LayerNorm(d_model)
+        self.dropout1 = nn.Dropout(dropout)
+        self.dropout1 = nn.Dropout(dropout)
 
-        self.d_model = d_model
-        self.nhead = nhead
+        self.activation = _get_activation_fn(activation)
 
-        self._reset_parameters()
-
-    def _reset_parameters(self):
-        r"""Initiate parameters in the transformer model."""
-
-        for p in self.parameters():
-            if p.dim() > 1:
-                nn.init.xavier_uniform_(p)
-
-    def forward(self, src, mask=None, src_key_padding_mask=None):
-        """
-        Args:
-            src: [sequence length, batch size, embed dim].
-            mask:
-            src_key_padding_mask: :math:`(N, S)`.
-
-        Returns:
-
-        """
-        src = self.positional_encoding(src)
-        x = self.encoder(src, mask=mask, src_key_padding_mask=src_key_padding_mask)
-        return x
-
-
-class PositionalEncoding(nn.Module):
-    r"""Inject some information about the relative or absolute position of the tokens
-        in the sequence. The positional encodings have the same dimension as
-        the embeddings, so that the two can be summed. Here, we use sine and cosine
-        functions of different frequencies.
-    .. math::
-        \text{PosEncoder}(pos, 2i) = sin(pos/10000^(2i/d_model))
-        \text{PosEncoder}(pos, 2i+1) = cos(pos/10000^(2i/d_model))
-        \text{where pos is the word position and i is the embed idx)
-    Args:
-        d_model: the embed dim (required).
-        dropout: the dropout value (default=0.1).
-        max_len: the max. length of the incoming sequence (default=5000).
-    Examples:
-        >>> pos_encoder = PositionalEncoding(d_model)
-    """
-
-    def __init__(self, d_model, dropout=0.1, max_len=5000):
-        super(PositionalEncoding, self).__init__()
-        self.dropout = nn.Dropout(p=dropout)
-
-        pe = torch.zeros(max_len, d_model)
-        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
-        pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
-        pe = pe.unsqueeze(0).transpose(0, 1)
-        self.register_buffer("pe", pe)
-
-    def forward(self, x):
-        r"""Inputs of forward function
-        Args:
-            x: the sequence fed to the positional encoder model (required).
-        Shape:
-            x: [sequence length, batch size, embed dim]
-            output: [sequence length, batch size, embed dim]
-        Examples:
-            >>> output = pos_encoder(x)
-        """
-
-        x = x + self.pe[: x.size(0), :]
-        return self.dropout(x)
+    def forward(self, src: torch.Tensor) -> torch.Tensor:
+        src = self.activation(self.linear1(src))
+        src = self.dropout1(self.linear2(src))
+        src = self.norm(src)
+        return src
 
 
 class PersonaEmbedding(nn.Module):
@@ -695,6 +615,15 @@ class PersonaEmbedding(nn.Module):
         super(PersonaEmbedding, self).__init__()
 
         self.linear1 = nn.Linear()
+
+
+def _get_activation_fn(activation):
+    if activation == "relu":
+        return F.relu
+    elif activation == "gelu":
+        return F.gelu
+
+    raise RuntimeError("activation should be relu/gelu, not {}".format(activation))
 
 
 def Embedding(num_embeddings, embedding_dim, padding_idx):
@@ -753,4 +682,4 @@ def base_architecture(args):
     args.laser_path = getattr(args, "laser_path", None)
     args.fixed_encoder = getattr(args, "fixed_encoder", False)
     args.fixed_decoder = getattr(args, "fixed_decoder", False)
-    args.num_controller_layers = getattr(args, "num_controller_layers", 0)
+    args.ff_dim = getattr(args, "ff_dim", 0)
