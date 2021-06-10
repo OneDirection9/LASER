@@ -104,7 +104,7 @@ def main():
             "lang_pairs": ("en1-en2",),
         },
         "XNLI": {
-            "lang_pairs": ("en1-en2",),
+            "lang_pairs": ("en1-en2", "zh1-zh2"),
         },
         "snli": {
             "lang_pairs": ("en1-en2",),

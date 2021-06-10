@@ -5,14 +5,26 @@
     {
       "type": "translation",
       "id": 0,
+      "src": "./data/XNLI/en1-en2/train.en1-en2.en1",
+      "tgt": "./data/XNLI/en1-en2/train.en1-en2.en2"
+    },
+    {
+      "type": "translation",
+      "id": 0,
+      "src": "./data/XNLI/en2-en1/train.en1-en2.en2",
+      "tgt": "./data/XNLI/en2-en1/train.en1-en2.en1"
+    },
+    {
+      "type": "translation",
+      "id": 0,
       "src": "./data/snli/en1-en2/train.en1-en2.en1",
       "tgt": "./data/snli/en1-en2/train.en1-en2.en2"
     },
     {
       "type": "translation",
       "id": 0,
-      "src": "./data/snli/en2-en1/train.en1-en2.en1",
-      "tgt": "./data/snli/en2-en1/train.en1-en2.en2"
+      "src": "./data/snli/en2-en1/train.en1-en2.en2",
+      "tgt": "./data/snli/en2-en1/train.en1-en2.en1"
     }
   ],
   "valid": [

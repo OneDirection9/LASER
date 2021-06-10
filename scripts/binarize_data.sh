@@ -55,7 +55,7 @@ binarize "${LASER}/data/news-crawl/bpe93" "${LASER}/data/news-crawl" "${lang_pai
 lang_pairs=( "en1-en2" )
 binarize "${LASER}/data/news-discuss/bpe93" "${LASER}/data/news-discuss" "${lang_pairs[@]}"
 
-lang_pairs=( "en1-en2" )
+lang_pairs=( "en1-en2" "zh1-zh2" )
 binarize "${LASER}/data/XNLI/bpe93" "${LASER}/data/XNLI" "${lang_pairs[@]}"
 
 lang_pairs=( "en1-en2" )

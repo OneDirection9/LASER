@@ -164,7 +164,7 @@ DownloadXNLI() {
 
   save_dir="${xnli_root}/raw"
   mkdir -p "${save_dir}"
-  langs=( "en" )
+  langs=( "en" "zh" )
   for lang in "${langs[@]}" ; do
     src="${lang}1"
     tgt="${lang}2"

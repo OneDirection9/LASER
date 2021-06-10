@@ -5,7 +5,8 @@ if [ -z "${LASER}" ]; then
   exit
 fi
 
-save_dir="${LASER}/checkpoints/controller"
+save_dir="${LASER}/checkpoints/controller_xnli_snli"
+mkdir -p ${save_dir}
 
 fairseq-train \
   "cfgs/controller.json" \
@@ -17,7 +18,6 @@ fairseq-train \
   --fixed-decoder \
   --save-dir "${save_dir}" \
   --tensorboard-logdir "${save_dir}/log" \
-  --fp16 \
   --optimizer adam \
   --lr 0.001 \
   --lr-scheduler inverse_sqrt \
@@ -28,7 +28,7 @@ fairseq-train \
   --encoder-dropout-out 0.1 \
   --ff-dim 2048 \
   --max-tokens 2000 \
-  --max-epoch 50 \
+  --max-epoch 80 \
   --encoder-bidirectional \
   --encoder-layers 5 \
   --encoder-hidden-size 512 \
