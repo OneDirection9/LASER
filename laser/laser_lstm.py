@@ -599,13 +599,12 @@ class BriefController(nn.Module):
 
         self.norm = nn.LayerNorm(d_model)
         self.dropout1 = nn.Dropout(dropout)
-        self.dropout1 = nn.Dropout(dropout)
 
         self.activation = _get_activation_fn(activation)
 
     def forward(self, src: torch.Tensor) -> torch.Tensor:
-        src = self.activation(self.linear1(src))
-        src = self.dropout1(self.linear2(src))
+        src2 = self.linear2(self.activation(self.linear1(src)))
+        src = src + self.dropout1(src2)
         src = self.norm(src)
         return src
 
