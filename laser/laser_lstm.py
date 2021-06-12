@@ -590,12 +590,16 @@ class BriefController(nn.Module):
         d_model,
         dim_feedforward=2048,
         dropout=0.1,
+        nhead=8,
         activation="relu",
     ) -> None:
         super(BriefController, self).__init__()
 
-        self.linear1 = nn.Linear(d_model, dim_feedforward)
-        self.linear2 = nn.Linear(dim_feedforward, d_model)
+        assert d_model % nhead == 0
+        self.nhead = nhead
+        inp = d_model / nhead
+        self.linear1 = nn.Linear(inp, dim_feedforward)
+        self.linear2 = nn.Linear(dim_feedforward, inp)
 
         self.norm = nn.LayerNorm(d_model)
         self.dropout1 = nn.Dropout(dropout)
@@ -603,8 +607,15 @@ class BriefController(nn.Module):
         self.activation = _get_activation_fn(activation)
 
     def forward(self, src: torch.Tensor) -> torch.Tensor:
-        src2 = self.linear2(self.activation(self.linear1(src)))
-        src = src + self.dropout1(src2)
+        """
+        Args:
+            src: (bsz, d_model)
+        """
+        bsz, dim = src.shape
+        x = src.view(bsz, -1, dim / self.nhead)
+        x = self.linear2(self.activation(self.linear1(x)))
+        x = x.view(bsz, dim)
+        src = src + self.dropout1(x)
         src = self.norm(src)
         return src
 
