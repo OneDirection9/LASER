@@ -597,7 +597,7 @@ class BriefController(nn.Module):
 
         assert d_model % nhead == 0
         self.nhead = nhead
-        inp = d_model / nhead
+        inp = d_model // nhead
         self.linear1 = nn.Linear(inp, dim_feedforward)
         self.linear2 = nn.Linear(dim_feedforward, inp)
 
@@ -611,10 +611,10 @@ class BriefController(nn.Module):
         Args:
             src: (bsz, d_model)
         """
-        bsz, dim = src.shape
-        x = src.view(bsz, -1, dim / self.nhead)
+        bsz, d_model = src.shape
+        x = src.view(bsz, -1, d_model // self.nhead)
         x = self.linear2(self.activation(self.linear1(x)))
-        x = x.view(bsz, dim)
+        x = x.view(bsz, d_model)
         src = src + self.dropout1(x)
         src = self.norm(src)
         return src
